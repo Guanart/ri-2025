@@ -2,35 +2,36 @@
 # -*- coding: utf-8 -*-
 
 import os
-import nltk
-from nltk.tokenize import word_tokenize
-
-nltk.download('punkt')
-nltk.download('punkt_tab')
+import re
 
 class Tokenizador:
     def __init__(self):
         pass
 
     def tokenizar(self, texto):
-        tokens = word_tokenize(texto)
+        # Eliminar caracteres especiales (deja caracteres alfanumericos y espacios)
+        texto = re.sub(r'[^\w\s]', '', texto)   # \w incluye los guiones bajos "_"?
+        # Split por espacios
+        tokens = texto.split()
+        # Eliminar tokens vacios (cadenas vacias)
+        tokens = [token for token in tokens if token]
+        # Pasar a minusculas
+        tokens = [token.lower() for token in tokens]
         return tokens
 
     def analizar_coleccion(self, path_documentos) -> dict:
         docs_analizados = 0
         cantidad_tokens = 0
-        terminos = {}   # Almacena los terminos con su DF. Ejemplo: {"casa": 3, "perro": 5, "gato": 2}
+        terminos = {}   # Almacena los terminos en el formato collection_data.json
 
-        for doc_name in os.listdir(path_documentos):
+        for doc_id, doc_name in enumerate(os.listdir(path_documentos), start=1):    # doc0.txt tendra id=1
             path_doc = os.path.join(path_documentos, doc_name)
             with open(path_doc, 'r') as f:
-                texto = f.read()
+                texto = f.read()  # Podemos leer los archivos completos, ya que no son muy grandes y solo tienen una linea
                 tokens = self.tokenizar(texto)
                 cantidad_tokens += len(tokens)
-                # Calcular DF
-                unique_tokens =  set(tokens)      # Limpio repetidos, para poder calcular la DF sumando +1 por token
-                for token in tokens:
-                    terminos[token] = terminos.get(token, 0) + 1
+
+                # Por cada token, 
                 docs_analizados += 1
 
         # {"data": [
