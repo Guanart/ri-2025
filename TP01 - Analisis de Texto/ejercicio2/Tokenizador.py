@@ -6,6 +6,34 @@ import re
 import json
 import sys
 
+'''
+2) Escriba un programa que realice análisis léxico sobre la colección **RI-tknz-data**. El programa debe recibir como parámetros el directorio donde se encuentran los documentos y un argumento que indica si se deben eliminar las palabras vacías (y en tal caso, el nombre del archivo que las contiene). Defina, además, una longitud mínima y máxima para los términos. Como salida, el programa debe generar:  
+     
+* Un archivo (terminos.txt) con la lista de términos a indexar (ordenado), su frecuencia en la colección y su DF (*Document Frequency*). 
+
+  Formato de salida: $\<termino\> \[ESP\] \<CF\> \[ESP\] \<DF\>$. 
+
+  Ejemplo:
+
+		    casa 238 3  
+		    perro 644 6  
+		    ...  
+		    zorro 12 1
+
+* Un segundo archivo (estadisticas.txt) con los siguientes datos (un ítem por línea y separados por espacio cuando sean más de un valor):  
+  * Cantidad de documentos procesados.  
+  * Cantidad de tokens y términos extraídos.  
+  * Promedio de tokens y términos de los documentos.  
+  * Largo promedio de un término.  
+  * Cantidad de *tokens* y términos del documento más corto y del más largo[^3].  
+  * Cantidad de términos que aparecen sólo 1 vez en la colección.
+
+* Un tercer archivo (frecuencias.txt), con:   
+  * La lista de los 10 términos más frecuentes y su CF (Collection Frequency). Un término por línea.  
+  * La lista de los 10 términos menos frecuentes y su CF. Un término por línea.
+'''
+
+
 class Tokenizador:
     def __init__(self, stopwords_path=None, eliminar_stopwords=False, min_len=1, max_len=20):
         self.stopwords = set()
@@ -47,6 +75,7 @@ class Tokenizador:
                 # Ordenar tokens para aplicar corte de control
                 tokens.sort()
                 i = 0
+                tokens_terms_por_documento[doc_name] = {"tokens": 0, "terminos": 0}
                 while i < len(tokens):
                     current = tokens[i]
                     count = 1
@@ -55,13 +84,12 @@ class Tokenizador:
                         count += 1
                         j += 1
                     if current not in terminos:
-                        terminos[current] = {"docid": [], "freq": [], "df": 0}
+                        terminos[current] = {"docid": [], "freq": [],  "cf": 0, "df": 0}
                     # terminos[current]["docid"].append(doc_id)
                     # terminos[current]["freq"].append(count)
+                    terminos[current]["cf"] += count
                     terminos[current]["df"] += 1
 
-                    if doc_name not in tokens_terms_por_documento:
-                        tokens_terms_por_documento[doc_name] = {"tokens": 0, "terminos": 0}
                     tokens_terms_por_documento[doc_name]["tokens"] += count
                     tokens_terms_por_documento[doc_name]["terminos"] += 1
 
@@ -69,16 +97,8 @@ class Tokenizador:
 
                 docs_analizados += 1
 
-        # num_terminos = len(terminos)
-        # promedio_tokens = sum(tokens_por_documento) / docs_analizados
-        # promedio_terminos = sum(terminos_por_documento) / docs_analizados
-        # largo_promedio_termino = sum(len(t) for t in terminos.keys()) / num_terminos
-        # tokens_min = min(tokens_por_documento)
-        # tokens_max = max(tokens_por_documento)
-        # terminos_min = min(terminos_por_documento)
-        # terminos_max = max(terminos_por_documento)
-        # terminos_una_vez = sum(1 for t in terminos.values() if t["cf"] == 1)
-
+        # Calcular estadisticas
+        estadisticas = self.calcular_estadisticas(terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens)
         return {
             "terminos": terminos,
             "estadisticas": {
@@ -95,6 +115,39 @@ class Tokenizador:
                 # "terminos_una_vez": terminos_una_vez,
             },
         }
+
+
+    def calcular_estadisticas(self, terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens):
+        num_terminos = len(terminos)    # complejidad O(1)
+        promedio_tokens = cantidad_tokens / docs_analizados
+        promedio_terminos = cantidad_terminos / docs_analizados
+
+        cant_terminos = 0
+        sum_largo_terminos = 0
+        terminos_una_vez = []
+        for term, freq in terminos.items(): # complejidad O(n)
+            cant_terminos += 1
+            sum_largo_terminos += len(term)
+            if freq["cf"] == 1:
+                terminos_una_vez.append(term)
+        largo_promedio_termino = sum_largo_terminos / cant_terminos
+        
+        doc_corto = tokens_terms_por_documento[0]
+        doc_largo = tokens_terms_por_documento[0]
+        for doc_name, data in tokens_terms_por_documento.items():
+            if data["tokens"] < doc_corto["tokens"]:
+                doc_corto = data
+            if data["tokens"] > doc_largo["tokens"]:
+                doc_largo = data
+        doc_corto = {"tokens": doc_corto["tokens"], "terminos": doc_corto["terminos"]}
+        doc_largo = {"tokens": doc_largo["tokens"], "terminos": doc_largo["terminos"]}
+
+        # Top 10 términos más y menos frecuentes
+        items = list(frecuencias.items())
+        items_sorted = sorted(items, key=lambda x: x[1])
+        top_10 = items_sorted[:10]
+        last_10 = items_sorted[-10:]
+
 
     def generar_archivos_salida(self, resultados, output_dir):
         terminos = resultados["terminos"]
