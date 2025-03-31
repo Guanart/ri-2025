@@ -43,9 +43,9 @@ Para la entrega del TP resuelto arme un único archivo (.pdf) y envíelo a trav�
 
     
 
-3) Escriba un segundo *tokenizer* que implemente los criterios del artículo de Grefenstette y Tapanainen para definir qué es una “palabra” (o término) y cómo tratar números y signos de puntuación. En este  caso  su  tokenizer deberá extraer y tratar como un único término: 
+3) Escriba un segundo *tokenizer* que implemente los criterios del artículo de Grefenstette y Tapanainen [^2] para definir qué es una “palabra” (o término) y cómo tratar números y signos de puntuación. En este  caso  su  tokenizer deberá extraer y tratar como un único término: 
 
-* Abreviaturas tal cual están escritas (por ejemplo, Dr., Lic., S.A., etc.)[^4]  
+* Abreviaturas tal cual están escritas (por ejemplo, Dr., Lic., S.A., etc.)[^4]   Discuta cómo resolvería la extracción de abreviaturas como ''NASA''.
 * Direcciones de correo electrónico y URLs.  
 * Números (por ejemplo, cantidades, teléfonos).  
 * Nombres propios (por ejemplo, Villa Carlos Paz, Manuel Belgrano, etc.)
@@ -54,6 +54,9 @@ Para la entrega del TP resuelto arme un único archivo (.pdf) y envíelo a trav�
 Utilice la colección para *debugging[^5]* de expresiones regulares provista por el equipo docente para extraer y comparar  la salida de su programa con los metadatos de la colección tal como lo realizó en el punto 1\.
 
 Por último, extraiga y almacene la misma información que en el punto 2 sobre la colección **RI-tknz-data** utilizando su nuevo *tokenizer*.
+
+[2] Gregory Grefenstette and Pasi Tapanainen. What is a word, what is a sentence? problems of tokenization. In Rank Xerox Research Centre, pages 79–87, 1994.
+
 
 4) A partir del programa del ejercicio 1, incluya un proceso de *stemming*[^6]. Luego de modificar su programa, corra nuevamente el proceso del ejercicio 2 y analice los cambios en la colección. ¿Qué implica este resultado? Busque ejemplos de pares de términos que tienen la misma raíz pero que el *stemmer* los trató diferente y términos que son diferentes y se los trató igual.
 
