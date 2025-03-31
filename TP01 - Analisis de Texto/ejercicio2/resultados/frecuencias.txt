@@ -1,0 +1,23 @@
+10 términos más frecuentes:
+universidad 2240
+nacional 1447
+facultad 1246
+ciencias 1030
+2012 944
+educación 857
+investigación 812
+â 796
+carreras 784
+argentina 774
+
+10 términos menos frecuentes:
+actualizará 1
+australiala 1
+dejando 1
+dougiamas 1
+mooodle 1
+paquete 1
+perth 1
+poe 1
+presencialconsiste 1
+toas 1
