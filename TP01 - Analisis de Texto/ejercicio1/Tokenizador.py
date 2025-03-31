@@ -51,8 +51,8 @@ class Tokenizador:
                         j += 1
                     if current not in terminos:
                         terminos[current] = {"docid": [], "freq": [], "df": 0}
-                    terminos[current]["docid"].append(doc_id)
-                    terminos[current]["freq"].append(count)
+                    # terminos[current]["docid"].append(doc_id)
+                    # terminos[current]["freq"].append(count)
                     terminos[current]["df"] += 1
                     i = j
 
