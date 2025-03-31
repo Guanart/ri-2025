@@ -8,7 +8,9 @@ import sys
 
 
 class Tokenizador:
-    def __init__(self, stopwords_path=None, eliminar_stopwords=False, min_len=1, max_len=20):
+    def __init__(
+        self, stopwords_path=None, eliminar_stopwords=False, min_len=1, max_len=20
+    ):
         self.stopwords = set()
         self.eliminar_stopwords = eliminar_stopwords
         self.min_len = min_len
@@ -22,8 +24,14 @@ class Tokenizador:
     def tokenizar(self, texto):
         texto = re.sub(r"[^\w\s]|_", "", texto)
         tokens = texto.split()
-        tokens = [token for token in tokens if token]   # Eliminar tokens vacios (cadenas vacias)
-        tokens = [token.lower() for token in tokens if self.min_len <= len(token) <= self.max_len]
+        tokens = [
+            token for token in tokens if token
+        ]  # Eliminar tokens vacios (cadenas vacias)
+        tokens = [
+            token.lower()
+            for token in tokens
+            if self.min_len <= len(token) <= self.max_len
+        ]
         if self.eliminar_stopwords:
             tokens = [token for token in tokens if token not in self.stopwords]
         return tokens
@@ -34,11 +42,13 @@ class Tokenizador:
         terminos = (
             {}
         )  # Almacena los terminos como keys, y como values los docid, freqs y DF
-        tokens_terms_por_documento = {}   # Almacena los nombres de documentos como key y la cantidad de tokens y terminos como value
+        tokens_terms_por_documento = (
+            {}
+        )  # Almacena los nombres de documentos como key y la cantidad de tokens y terminos como value
 
         for doc_name in os.listdir(path_documentos):
             path_doc = os.path.join(path_documentos, doc_name)
-            with open(path_doc, "r", encoding="utf-8" ) as f:
+            with open(path_doc, "r", encoding="utf-8") as f:
                 texto = (
                     f.read()
                 )  # Podemos leer los archivos completos, ya que no son muy grandes y solo tienen una linea
@@ -57,7 +67,7 @@ class Tokenizador:
                         count += 1
                         j += 1
                     if current not in terminos:
-                        terminos[current] = {"docid": [], "freq": [],  "cf": 0, "df": 0}
+                        terminos[current] = {"docid": [], "freq": [], "cf": 0, "df": 0}
                     # terminos[current]["docid"].append(doc_id)
                     # terminos[current]["freq"].append(count)
                     terminos[current]["cf"] += count
@@ -71,16 +81,15 @@ class Tokenizador:
                 docs_analizados += 1
 
         # Calcular estadisticas y frecuencias
-        estadisticas = self.calcular_estadisticas(terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens)
+        estadisticas = self.calcular_estadisticas(
+            terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens
+        )
         top_10, last_10 = self.calcular_frecuencias(terminos)
 
         return {
             "terminos": terminos,
             "estadisticas": estadisticas,
-            "frecuencias": {
-                "top_10": top_10,
-                "last_10": last_10
-            },
+            "frecuencias": {"top_10": top_10, "last_10": last_10},
         }
 
     def calcular_frecuencias(self, terminos):
@@ -91,21 +100,23 @@ class Tokenizador:
         top_10 = items_sorted[-10:][::-1]
         return top_10, last_10
 
-    def calcular_estadisticas(self, terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens):
-        num_terminos = len(terminos)    # complejidad O(1)
+    def calcular_estadisticas(
+        self, terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens
+    ):
+        num_terminos = len(terminos)  # complejidad O(1)
         promedio_tokens = cantidad_tokens / docs_analizados
         promedio_terminos = num_terminos / docs_analizados
 
         cant_terminos = 0
         sum_largo_terminos = 0
         terminos_una_vez = []
-        for term, freq in terminos.items(): # complejidad O(n)
+        for term, freq in terminos.items():  # complejidad O(n)
             cant_terminos += 1
             sum_largo_terminos += len(term)
             if freq["cf"] == 1:
                 terminos_una_vez.append(term)
         largo_promedio_termino = sum_largo_terminos / cant_terminos
-        
+
         doc_corto = next(iter(tokens_terms_por_documento.values()))
         doc_largo = next(iter(tokens_terms_por_documento.values()))
         for doc_name, data in tokens_terms_por_documento.items():
@@ -128,7 +139,6 @@ class Tokenizador:
             "terminos_una_vez": len(terminos_una_vez),
         }
 
-
     def generar_archivos_salida(self, resultados, output_dir):
         terminos = resultados["terminos"]
         estadisticas = resultados["estadisticas"]
@@ -146,10 +156,18 @@ class Tokenizador:
             f.write(f"Cantidad de Términos: {estadisticas['num_terminos']}\n")
             f.write(f"Promedio Tokens: {estadisticas['promedio_tokens']}\n")
             f.write(f"Promedio Términos: {estadisticas['promedio_terminos']}\n")
-            f.write(f"Largo promedio de los Términos: {estadisticas['largo_promedio_termino']}\n")
-            f.write(f"Cantidad de tokens del documento más corto y más largo: {estadisticas['doc_corto']['tokens']} {estadisticas['doc_largo']['tokens']}\n")
-            f.write(f"Cantidad de términos del documento más corto y más largo: {estadisticas['doc_corto']['terminos']} {estadisticas['doc_largo']['terminos']}\n")
-            f.write(f"Términos con frecuencia 1 en la colección: {estadisticas['terminos_una_vez']}\n")
+            f.write(
+                f"Largo promedio de los Términos: {estadisticas['largo_promedio_termino']}\n"
+            )
+            f.write(
+                f"Cantidad de tokens del documento más corto y más largo: {estadisticas['doc_corto']['tokens']} {estadisticas['doc_largo']['tokens']}\n"
+            )
+            f.write(
+                f"Cantidad de términos del documento más corto y más largo: {estadisticas['doc_corto']['terminos']} {estadisticas['doc_largo']['terminos']}\n"
+            )
+            f.write(
+                f"Términos con frecuencia 1 en la colección: {estadisticas['terminos_una_vez']}\n"
+            )
 
         # Archivo frecuencias.txt
         with open(os.path.join(output_dir, "frecuencias.txt"), "w") as f:
@@ -163,8 +181,12 @@ class Tokenizador:
 
 if __name__ == "__main__":
     if len(sys.argv) < 5:
-        print("Uso: python3 Tokenizador.py <directorio_documentos> <eliminar_stopwords> <archivo_stopwords> <directorio_salida>")
-        print("Ejemplo: python3 Tokenizador.py RI-tknz-data true stopwords.txt resultados")
+        print(
+            "Uso: python3 Tokenizador.py <directorio_documentos> <eliminar_stopwords> <archivo_stopwords> <directorio_salida>"
+        )
+        print(
+            "Ejemplo: python3 Tokenizador.py RI-tknz-data true stopwords.txt resultados"
+        )
         sys.exit(1)
 
     path_documentos = sys.argv[1]
@@ -175,6 +197,8 @@ if __name__ == "__main__":
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    tokenizador = Tokenizador(stopwords_path=stopwords_path, eliminar_stopwords=eliminar_stopwords)
+    tokenizador = Tokenizador(
+        stopwords_path=stopwords_path, eliminar_stopwords=eliminar_stopwords
+    )
     resultados = tokenizador.analizar_coleccion(path_documentos)
     tokenizador.generar_archivos_salida(resultados, output_dir)
