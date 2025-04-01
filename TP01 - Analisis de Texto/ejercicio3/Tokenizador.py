@@ -24,13 +24,20 @@ class Tokenizador:
         # Emails, URLs, números, nombres compuestos en mayúscula o con mayúsculas mixtas.
         patron = re.compile(
             r"""
-            (?:[A-Z][a-z]+\s[A-Z][a-z]+(?:\s[A-Z][a-z]+)*)         # Nombres propios compuestos
-            |(?:[A-Za-z]+\.[A-Za-z]+(?:\.[A-Za-z]+)*)             # Abreviaturas (Dr., Lic., S.A.)
-            |(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,})    # Emails
-            |(?:https?://[^\s]+)                                  # URLs
-            |(?:\d+(?:[\.,]\d+)*)                                 # Números con decimales
-            |(?:[A-Z]+)                                           # Palabras en mayúsculas (p.ej. NASA)
-            |(?:[A-Za-z]+)                                        # Resto de palabras
+            # URLs
+            (?:(?:https?|ftp):\/\/           # Protocolo: http, https o ftp seguido de ://
+                (?:[a-zA-Z0-9.-]+\.[A-Za-z]{2,})   # Dominio: al menos un punto y extensión (p.ej., example.com)
+                (?::\d{1,5})?                     # Puerto opcional: : seguido de dígitos
+                (?:\/[^\s?#]*)?               # Path opcional: barra seguida de cualquier caracter excepto espacio, ? o #
+                (?:\?[^\s#]*)?                # Query string opcional: ? seguido de cualquier caracter excepto espacio o #
+                (?:\#[^\s]*)?                # Fragmento opcional: # seguido de cualquier caracter excepto espacio
+            )
+            |(?:[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,})  # Correos electrónicos
+            |(?:(?:[A-Za-z]\.){2,}(?:[A-Za-z]+)*)                    # Acrónimos como "U.S.A.", "EE.UU.", "D.A.S.M.I"
+            |(?:[A-Za-z]{2,}\.)                            # Abreviaturas como "Dr.", "Lic.", "Sra."
+            |(?:[A-Z][a-z]+(?:\s[A-Z][a-z]+)+)  # Nombres propios compuestos (al menos dos palabras con mayúscula inicial) como "Domingo Faustino Sarmiento"
+            |(?:\d+(?:[-\.,]\d+)*)                         # Números (con guiones, puntos o comas) como fechas o decimales
+            |(?:[A-Za-z]+)                                 # Resto de palabras (solo letras sin acentos)
             """,
             re.VERBOSE,
         )
@@ -190,7 +197,7 @@ if __name__ == "__main__":
             "Uso: python3 Tokenizador.py <directorio_documentos> <eliminar_stopwords> <archivo_stopwords> <directorio_salida>"
         )
         print(
-            "Ejemplo: python3 Tokenizador.py RI-tknz-data true stopwords.txt resultados"
+            "Ejemplos:\npython3 Tokenizador.py RI-tknz-data true stopwords.txt resultados\npython3 Tokenizador.py RE_collection_test/collection_test_ER2 true stopwords.txt resultados"
         )
         sys.exit(1)
 
