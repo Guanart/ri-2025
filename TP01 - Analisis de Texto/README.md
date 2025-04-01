@@ -55,12 +55,9 @@ Utilice la colección para *debugging[^5]* de expresiones regulares provista por
 
 Por último, extraiga y almacene la misma información que en el punto 2 sobre la colección **RI-tknz-data** utilizando su nuevo *tokenizer*.
 
-[2] Gregory Grefenstette and Pasi Tapanainen. What is a word, what is a sentence? problems of tokenization. In Rank Xerox Research Centre, pages 79–87, 1994.
-
 
 4) A partir del programa del ejercicio 1, incluya un proceso de *stemming*[^6]. Luego de modificar su programa, corra nuevamente el proceso del ejercicio 2 y analice los cambios en la colección. ¿Qué implica este resultado? Busque ejemplos de pares de términos que tienen la misma raíz pero que el *stemmer* los trató diferente y términos que son diferentes y se los trató igual.
 
-	
 
 5) Sobre la colección Vaswani[^7], ejecute los *stemmers* Porter y Lancaster provistos en el módulo nltk.stem. Compare: cantidad de tokens únicos resultantes, resultado 1 a 1 y tiempo de ejecución para toda la colección. ¿Qué conclusiones puede obtener de la ejecución de uno y otro?  
      
