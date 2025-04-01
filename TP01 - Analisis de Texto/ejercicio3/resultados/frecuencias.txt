@@ -11,13 +11,13 @@ http://www.tcpipguide.com/free/t_tcpipprocessesmultiplexingandclientserverapplic
 https://docs.google.com/document/d/1nind55cfbb_7pksdirn0xghznhjz_n93lheqzf1aozy/edit?usp=sharing 1754
 
 10 términos menos frecuentes:
-domingo faustino sarmiento sra 1
-sra. 79
+sra. 80
 u.s.a 173
 casa 301
 https://www.labredes.unlu.edu.ar/tyr2022 374
 ftp://unlu.edu.ar 436
 https://www.youtube.com/watch?v=zkqufwb84zg 600
-ee. 992
-uu. 992
-domingo faustino sarmiento 999
+ee.uu. 992
+domingo faustino sarmiento 1000
+abc.def@mail-archive.com 1034
+mratto@mail.unlu.edu.ar 1528

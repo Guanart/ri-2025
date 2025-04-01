@@ -33,9 +33,9 @@ class Tokenizador:
                 (?:\#[^\s]*)?                # Fragmento opcional: # seguido de cualquier caracter excepto espacio
             )
             |(?:[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,})  # Correos electrónicos
-            |(?:(?:[A-Za-z]\.){2,}(?:[A-Za-z]+)*)                    # Acrónimos como "U.S.A.", "EE.UU.", "D.A.S.M.I"
+            |(?:(?:[A-Za-z]+(?:\.[A-Za-z]+)+)\.?)                    # Acrónimos como "U.S.A.", "EE.UU.", "D.A.S.M.I"
             |(?:[A-Za-z]{2,}\.)                            # Abreviaturas como "Dr.", "Lic.", "Sra."
-            |(?:[A-Z][a-z]+(?:\s[A-Z][a-z]+)+)  # Nombres propios compuestos (al menos dos palabras con mayúscula inicial) como "Domingo Faustino Sarmiento"
+            |(?:(?:[A-Z][a-z]+)(?:\s+(?![A-Za-z]{2,}\.)[A-Z][a-z]+)+)  # Nombres propios compuestos (al menos dos palabras con mayúscula inicial) como "Domingo Faustino Sarmiento"
             |(?:\d+(?:[-\.,]\d+)*)                         # Números (con guiones, puntos o comas) como fechas o decimales
             |(?:[A-Za-z]+)                                 # Resto de palabras (solo letras sin acentos)
             """,
