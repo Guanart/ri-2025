@@ -11,13 +11,13 @@ are 6562
 with 5168
 
 10 términos menos frecuentes:
-1 1
-2 1
-3 1
-4 1
-5 1
 reclock 1
-6 1
-7 1
 spotweld 1
-8 1
+octal 1
+sriver 1
+buchholz 1
+duhamel 1
+edldtkel 1
+andt 1
+thei 1
+quasiharmon 1

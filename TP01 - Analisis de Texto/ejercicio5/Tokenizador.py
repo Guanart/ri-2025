@@ -116,41 +116,52 @@ class Tokenizador:
         tokens_terms_por_documento = {}  # Almacena, para cada documento (usamos el DOCNO o generamos un id), la cantidad de tokens y términos
 
         with open(path_coleccion, "r", encoding="utf-8") as f:
-            contenido = f.read()
-        # Extraer documentos delimitados por <DOC> ... </DOC>
-        docs = re.findall(r"<DOC>(.*?)</DOC>", contenido, flags=re.DOTALL)
+            line = f.readline()
+            while line:
+                # Leer el contenido del documento
+                doc = ""
+                while line and not line.startswith("</DOC>"):
+                    if line.startswith("<DOC>"):
+                        pass
+                    elif line.startswith("<DOCNO>"):
+                        # Extraer el número de documento
+                        docno_match = re.search(r"<DOCNO>(.*?)</DOCNO>", line)
+                        doc_id = docno_match.group(1).strip()
+                        # Inicializar el diccionario para el documento
+                        tokens_terms_por_documento[doc_id] = {"tokens": 0, "terminos": 0}
+                    else:
+                        doc += line
+                    line = f.readline()
 
-        for idx, doc in enumerate(docs):
-            # Extraer el número de documento si está presente
-            docno_match = re.search(r"<DOCNO>(.*?)</DOCNO>", doc)
-            doc_id = docno_match.group(1).strip() if docno_match else f"doc_{idx+1}"
-            # Eliminar todas las etiquetas XML
-            texto = re.sub(r"<[^>]+>", " ", doc)
-            tokens = self.tokenizar(texto)
-            cantidad_tokens += len(tokens)
+                # Procesar el contenido del documento
+                if doc:
+                    tokens = self.tokenizar(doc)
+                    cantidad_tokens += len(tokens)
+                    # Ordenar tokens para aplicar corte de control
+                    tokens.sort()
+                    i = 0
+                    while i < len(tokens):
+                        current = tokens[i]
+                        count = 1
+                        j = i + 1
+                        while j < len(tokens) and tokens[j] == current:
+                            count += 1
+                            j += 1
+                        if current not in terminos:
+                            terminos[current] = {"docid": [], "freq": [], "cf": 0, "df": 0}
+                        # terminos[current]["docid"].append(doc_id)
+                        # terminos[current]["freq"].append(count)
+                        terminos[current]["cf"] += count
+                        terminos[current]["df"] += 1
+                        tokens_terms_por_documento[doc_id]["tokens"] += count
+                        tokens_terms_por_documento[doc_id]["terminos"] += 1
+                        i = j
 
-            tokens.sort()
-            tokens_terms_por_documento[doc_id] = {"tokens": 0, "terminos": 0}
-            i = 0
-            while i < len(tokens):
-                current = tokens[i]
-                count = 1
-                j = i + 1
-                while j < len(tokens) and tokens[j] == current:
-                    count += 1
-                    j += 1
-                if current not in terminos:
-                    terminos[current] = {"docid": [], "freq": [], "cf": 0, "df": 0}
-                terminos[current]["cf"] += count
-                terminos[current]["df"] += 1
+                    docs_analizados += 1
+                # Leer la siguiente línea después de </DOC>
+                line = f.readline()
 
-                tokens_terms_por_documento[doc_id]["tokens"] += count
-                tokens_terms_por_documento[doc_id]["terminos"] += 1
-
-                i = j
-
-            docs_analizados += 1
-
+        # Calcular estadísticas y frecuencias
         estadisticas = self.calcular_estadisticas(terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens)
         top_10, last_10 = self.calcular_frecuencias(terminos)
         return {
