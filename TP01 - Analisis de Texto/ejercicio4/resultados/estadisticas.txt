@@ -1,0 +1,9 @@
+Documentos analizados: 498
+Cantidad de Tokens: 223111
+Cantidad de Términos: 31648
+Promedio Tokens: 448.0140562248996
+Promedio Términos: 63.55020080321285
+Largo promedio de los Términos: 8.54196157735086
+Cantidad de tokens del documento más corto y más largo: 1 23022
+Cantidad de términos del documento más corto y más largo: 1 7550
+Términos con frecuencia 1 en la colección: 16558
