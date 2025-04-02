@@ -6,6 +6,7 @@ import re
 from langdetect import detect
 import numpy as np
 
+
 class TokenizadorLenguaje:
     def __init__(self, min_len=1, max_len=20):
         self.min_len = min_len
@@ -14,7 +15,9 @@ class TokenizadorLenguaje:
     def tokenizar(self, texto, w=None):
         # Se conserva la mayoría de caracteres especiales (incluyendo acentos) para identificación de lenguajes,
         # pero se eliminan otros que no son relevantes.
-        texto = re.sub(r"[^\w\s¿?¡!'áéíóúüñçàèìòùâêîôûäëïöü]", "", texto, flags=re.UNICODE)
+        texto = re.sub(
+            r"[^\w\s¿?¡!'áéíóúüñçàèìòùâêîôûäëïöü]", "", texto, flags=re.UNICODE
+        )
         if w:
             # Genera n-gramas de longitud w a partir del texto (caracteres consecutivos)
             tokens = []
@@ -23,7 +26,11 @@ class TokenizadorLenguaje:
         else:
             tokens = texto.split()
         tokens = [token for token in tokens if token]  # Eliminar tokens vacíos
-        tokens = [token.lower() for token in tokens if self.min_len <= len(token) <= self.max_len]
+        tokens = [
+            token.lower()
+            for token in tokens
+            if self.min_len <= len(token) <= self.max_len
+        ]
         return tokens
 
     def entrenar_modelos(self, path_training):
@@ -41,25 +48,20 @@ class TokenizadorLenguaje:
                     # Modelo de frecuencia de letras (unigrama)
                     tokens_frecuencia = self.tokenizar(line, w=1)
                     for token in tokens_frecuencia:
-                        modelos_frecuencia[idioma][token] = modelos_frecuencia[idioma].get(token, 0) + 1
+                        modelos_frecuencia[idioma][token] = (
+                            modelos_frecuencia[idioma].get(token, 0) + 1
+                        )
                     # Modelo de combinaciones (bigramas)
                     tokens_combinaciones = self.tokenizar(line, w=2)
                     for token in tokens_combinaciones:
-                        modelos_combinaciones[idioma][token] = modelos_combinaciones[idioma].get(token, 0) + 1
+                        modelos_combinaciones[idioma][token] = (
+                            modelos_combinaciones[idioma].get(token, 0) + 1
+                        )
         return modelos_frecuencia, modelos_combinaciones
 
-    def correlacion_numpy(dic1, dic2):
-        # Une las claves y construye dos vectores con las frecuencias
-        keys = list(set(dic1.keys()) | set(dic2.keys()))
-        vec1 = np.array([dic1.get(k, 0) for k in keys])
-        vec2 = np.array([dic2.get(k, 0) for k in keys])
-        # Si alguna varianza es 0, se retorna 0 para evitar división por cero
-        if np.std(vec1) == 0 or np.std(vec2) == 0:
-            return 0
-        corr = np.corrcoef(vec1, vec2)[0, 1]
-        return corr
-
-    def identificar_lenguaje(self, path_test, modelos_frecuencia, modelos_combinaciones):
+    def identificar_lenguaje(
+        self, path_test, modelos_frecuencia, modelos_combinaciones
+    ):
         """
         Identifica el idioma de cada línea del archivo de prueba utilizando:
           - La distribución de la frecuencia de letras (unigrama).
@@ -68,11 +70,12 @@ class TokenizadorLenguaje:
         También se utiliza langdetect para la comparación.
         Devuelve una lista de diccionarios con las predicciones y el ID del texto.
         """
+
         # Función auxiliar: normalizar las frecuencias a distribuciones relativas (divide la frecuencia absoluta de un token por el total de tokens en el texto)
         # Se usa para evitar que un token con alta frecuencia en un idioma influya demasiado en la distancia
         def normalizar(dic):
             total = sum(dic.values())
-            return {k: v/total for k, v in dic.items()} if total > 0 else dic
+            return {k: v / total for k, v in dic.items()} if total > 0 else dic
 
         # Función auxiliar: distancia entre dos distribuciones
         def distancia(dic1, dic2):
@@ -84,8 +87,13 @@ class TokenizadorLenguaje:
             return total_distance
 
         # Normalizar los modelos entrenados para cada idioma
-        norm_modelos_frecuencia = {idioma: normalizar(modelo) for idioma, modelo in modelos_frecuencia.items()}
-        norm_modelos_combinaciones = {idioma: normalizar(modelo) for idioma, modelo in modelos_combinaciones.items()}
+        norm_modelos_frecuencia = {
+            idioma: normalizar(modelo) for idioma, modelo in modelos_frecuencia.items()
+        }
+        norm_modelos_combinaciones = {
+            idioma: normalizar(modelo)
+            for idioma, modelo in modelos_combinaciones.items()
+        }
 
         resultados = []
         with open(path_test, "r", encoding="iso-8859-1") as f:
@@ -107,7 +115,9 @@ class TokenizadorLenguaje:
                 dist_frecuencia = {}
                 for idioma, modelo in norm_modelos_frecuencia.items():
                     dist_frecuencia[idioma] = distancia(modelo, norm_freq_line)
-                pred_frecuencia = min(dist_frecuencia, key=dist_frecuencia.get) # Con key=dist_frecuencia.get en lugar de comparar directamente las claves del diccionario, se comparan los valores asociados a esas claves
+                pred_frecuencia = min(
+                    dist_frecuencia, key=dist_frecuencia.get
+                )  # Con key=dist_frecuencia.get en lugar de comparar directamente las claves del diccionario, se comparan los valores asociados a esas claves
 
                 # Comparar la distribución del texto con la de cada idioma en los modelos (método combinaciones)
                 dist_combinaciones = {}
@@ -118,12 +128,14 @@ class TokenizadorLenguaje:
                 # Langdetect
                 pred_langdetect = detect(texto)
 
-                resultados.append({
-                    "texto": i,
-                    "frecuencia": pred_frecuencia,
-                    "combinaciones": pred_combinaciones,
-                    "langdetect": pred_langdetect
-                })
+                resultados.append(
+                    {
+                        "texto": i,
+                        "frecuencia": pred_frecuencia,
+                        "combinaciones": pred_combinaciones,
+                        "langdetect": pred_langdetect,
+                    }
+                )
 
         return resultados
 
@@ -148,13 +160,26 @@ class TokenizadorLenguaje:
                     correctos_langdetect += 1
 
             print("Resultados finales:")
-            print(f"Método Frecuencia: {correctos_frecuencia}/{len(solucion)} correctos")
-            print(f"Método Combinaciones: {correctos_combinaciones}/{len(solucion)} correctos")
-            print(f"Método LangDetect: {correctos_langdetect}/{len(solucion)} correctos")
+            print(
+                f"Método Frecuencia: {correctos_frecuencia}/{len(solucion)} correctos"
+            )
+            print(
+                f"Método Combinaciones: {correctos_combinaciones}/{len(solucion)} correctos"
+            )
+            print(
+                f"Método LangDetect: {correctos_langdetect}/{len(solucion)} correctos"
+            )
             f.write("Resultados finales:\n")
-            f.write(f"Método Frecuencia: {correctos_frecuencia}/{len(solucion)} correctos\n")
-            f.write(f"Método Combinaciones: {correctos_combinaciones}/{len(solucion)} correctos\n")
-            f.write(f"Método LangDetect: {correctos_langdetect}/{len(solucion)} correctos\n")
+            f.write(
+                f"Método Frecuencia: {correctos_frecuencia}/{len(solucion)} correctos\n"
+            )
+            f.write(
+                f"Método Combinaciones: {correctos_combinaciones}/{len(solucion)} correctos\n"
+            )
+            f.write(
+                f"Método LangDetect: {correctos_langdetect}/{len(solucion)} correctos\n"
+            )
+
 
 if __name__ == "__main__":
     # Archivos de entrenamiento y prueba
@@ -169,10 +194,14 @@ if __name__ == "__main__":
     tokenizador = TokenizadorLenguaje()
 
     # Entrenar modelos de frecuencia (unigrama) y de combinaciones (bigramas)
-    modelos_frecuencia, modelos_combinaciones = tokenizador.entrenar_modelos(path_training)
+    modelos_frecuencia, modelos_combinaciones = tokenizador.entrenar_modelos(
+        path_training
+    )
 
     # Identificar lenguajes en el conjunto de prueba
-    resultados = tokenizador.identificar_lenguaje(path_test, modelos_frecuencia, modelos_combinaciones)
+    resultados = tokenizador.identificar_lenguaje(
+        path_test, modelos_frecuencia, modelos_combinaciones
+    )
 
     # Comparar con la solución provista (si existe) y con langdetect
     with open(path_solution, "r", encoding="iso-8859-1") as f:
