@@ -1,0 +1,4 @@
+Resultados finales:
+Método Frecuencia: 276/300 correctos
+Método Combinaciones: 293/300 correctos
+Método LangDetect: 296/300 correctos
