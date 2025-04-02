@@ -64,10 +64,9 @@ class TokenizadorLenguaje:
         Identifica el idioma de cada línea del archivo de prueba utilizando:
           - La distribución de la frecuencia de letras (unigrama).
           - La distribución de combinaciones de letras (bigramas).
-        Se comparan las distribuciones normalizadas (relativas) del texto con las de los modelos entrenados,
-        usando la distancia L₁ (suma de diferencias absolutas).
-        Además, se utiliza langdetect para la comparación.
-        Devuelve una lista de diccionarios con las predicciones y el texto.
+        Se comparan las distribuciones normalizadas del texto con las de los modelos entrenados también normalizadas, usando la distancia (suma de diferencias absolutas). El más cercano a 0 es el idioma más probable.
+        También se utiliza langdetect para la comparación.
+        Devuelve una lista de diccionarios con las predicciones y el ID del texto.
         """
         # Función auxiliar: normalizar las frecuencias a distribuciones relativas (divide la frecuencia absoluta de un token por el total de tokens en el texto)
         # Se usa para evitar que un token con alta frecuencia en un idioma influya demasiado en la distancia
@@ -128,7 +127,7 @@ class TokenizadorLenguaje:
 
         return resultados
 
-    def generar_archivos_salida(self, resultados, solucion):
+    def generar_archivo_salida(self, resultados, solucion):
         correctos_frecuencia = 0
         correctos_combinaciones = 0
         correctos_langdetect = 0
@@ -180,4 +179,4 @@ if __name__ == "__main__":
         solucion = [line.strip().split()[1] for line in f.readlines()]
 
     # Generar archivo de salida con los resultados
-    tokenizador.generar_archivos_salida(resultados, solucion)
+    tokenizador.generar_archivo_salida(resultados, solucion)
