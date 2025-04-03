@@ -10,7 +10,12 @@ import nltk.stem
 
 class Tokenizador:
     def __init__(
-        self, stopwords_path=None, eliminar_stopwords=False, stemming=True, min_len=1, max_len=20
+        self,
+        stopwords_path=None,
+        eliminar_stopwords=False,
+        stemming=True,
+        min_len=1,
+        max_len=20,
     ):
         self.stopwords = set()
         self.eliminar_stopwords = eliminar_stopwords
@@ -37,7 +42,7 @@ class Tokenizador:
         if self.eliminar_stopwords:
             tokens = [token for token in tokens if token not in self.stopwords]
         if self.stemming:
-            stemmer = nltk.stem.SnowballStemmer('spanish') # PorterStemmer()
+            stemmer = nltk.stem.SnowballStemmer("spanish")  # PorterStemmer()
             tokens = [stemmer.stem(token) for token in tokens]
         return tokens
 

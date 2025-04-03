@@ -10,7 +10,13 @@ import nltk.stem
 
 class Tokenizador:
     def __init__(
-        self, stopwords_path=None, eliminar_stopwords=False, stemming=True, stemmer_type="snowball", min_len=1, max_len=20
+        self,
+        stopwords_path=None,
+        eliminar_stopwords=False,
+        stemming=True,
+        stemmer_type="snowball",
+        min_len=1,
+        max_len=20,
     ):
         self.stopwords = set()
         self.eliminar_stopwords = eliminar_stopwords
@@ -47,7 +53,7 @@ class Tokenizador:
             else:
                 stemmer = nltk.stem.SnowballStemmer("spanish")
             tokens = [stemmer.stem(token) for token in tokens]
-            
+
         return tokens
 
     def analizar_coleccion(self, path_documentos) -> dict:
@@ -113,7 +119,9 @@ class Tokenizador:
         docs_analizados = 0
         cantidad_tokens = 0
         terminos = {}  # Almacena los términos y sus frecuencias globales
-        tokens_terms_por_documento = {}  # Almacena, para cada documento (usamos el DOCNO o generamos un id), la cantidad de tokens y términos
+        tokens_terms_por_documento = (
+            {}
+        )  # Almacena, para cada documento (usamos el DOCNO o generamos un id), la cantidad de tokens y términos
 
         with open(path_coleccion, "r", encoding="utf-8") as f:
             line = f.readline()
@@ -128,7 +136,10 @@ class Tokenizador:
                         docno_match = re.search(r"<DOCNO>(.*?)</DOCNO>", line)
                         doc_id = docno_match.group(1).strip()
                         # Inicializar el diccionario para el documento
-                        tokens_terms_por_documento[doc_id] = {"tokens": 0, "terminos": 0}
+                        tokens_terms_por_documento[doc_id] = {
+                            "tokens": 0,
+                            "terminos": 0,
+                        }
                     else:
                         doc += line
                     line = f.readline()
@@ -148,7 +159,12 @@ class Tokenizador:
                             count += 1
                             j += 1
                         if current not in terminos:
-                            terminos[current] = {"docid": [], "freq": [], "cf": 0, "df": 0}
+                            terminos[current] = {
+                                "docid": [],
+                                "freq": [],
+                                "cf": 0,
+                                "df": 0,
+                            }
                         # terminos[current]["docid"].append(doc_id)
                         # terminos[current]["freq"].append(count)
                         terminos[current]["cf"] += count
@@ -162,7 +178,9 @@ class Tokenizador:
                 line = f.readline()
 
         # Calcular estadísticas y frecuencias
-        estadisticas = self.calcular_estadisticas(terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens)
+        estadisticas = self.calcular_estadisticas(
+            terminos, tokens_terms_por_documento, docs_analizados, cantidad_tokens
+        )
         top_10, last_10 = self.calcular_frecuencias(terminos)
         return {
             "terminos": terminos,
@@ -264,7 +282,12 @@ if __name__ == "__main__":
 
     # Ejecutar con PorterStemmer
     stemmer = "porter"
-    tokenizador = Tokenizador(stopwords_path=None, eliminar_stopwords=False, stemming=True, stemmer_type=stemmer)
+    tokenizador = Tokenizador(
+        stopwords_path=None,
+        eliminar_stopwords=False,
+        stemming=True,
+        stemmer_type=stemmer,
+    )
     start_time = time.time()
     resultados_porter = tokenizador.analizar_coleccion_trec(path_documentos)
     porter_time = time.time() - start_time
@@ -274,7 +297,12 @@ if __name__ == "__main__":
 
     # Ejecutar con LancasterStemmer
     stemmer = "lancaster"
-    tokenizador = Tokenizador(stopwords_path=None, eliminar_stopwords=False, stemming=True, stemmer_type="lancaster")
+    tokenizador = Tokenizador(
+        stopwords_path=None,
+        eliminar_stopwords=False,
+        stemming=True,
+        stemmer_type="lancaster",
+    )
     start_time = time.time()
     resultados_lancaster = tokenizador.analizar_coleccion_trec(path_documentos)
     lancaster_time = time.time() - start_time

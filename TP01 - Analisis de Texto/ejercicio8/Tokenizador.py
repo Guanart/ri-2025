@@ -80,7 +80,12 @@ class Tokenizador:
                             count += 1
                             j += 1
                         if current not in terminos:
-                            terminos[current] = {"docid": [], "freq": [], "cf": 0, "df": 0}
+                            terminos[current] = {
+                                "docid": [],
+                                "freq": [],
+                                "cf": 0,
+                                "df": 0,
+                            }
                         # terminos[current]["docid"].append(doc_id)
                         # terminos[current]["freq"].append(count)
                         terminos[current]["cf"] += count
@@ -198,11 +203,11 @@ if __name__ == "__main__":
             "Uso: python3 Tokenizador.py <directorio_documentos> <eliminar_stopwords> <archivo_stopwords> <directorio_salida>"
         )
         print(
-            '''Ejemplos:
+            """Ejemplos:
             python3 Tokenizador.py RI-tknz-data true stopwords.txt resultados
             python3 Tokenizador.py RE_collection_test/collection_test_ER2 true stopwords.txt resultados
             python3 Tokenizador.py datos/ false '' output
-            '''
+            """
         )
         sys.exit(1)
 
