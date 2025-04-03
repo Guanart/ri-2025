@@ -37,7 +37,7 @@ class Tokenizador:
             |(?:[A-Za-z]{2,}\.)                            # Abreviaturas como "Dr.", "Lic.", "Sra."
             |(?:(?:[A-Z][a-z]+)(?:\s+(?![A-Za-z]{2,}\.)[A-Z][a-z]+)+)  # Nombres propios compuestos (al menos dos palabras con mayúscula inicial) como "Domingo Faustino Sarmiento"
             |(?:\d+(?:[-\.,]\d+)*)                         # Números (con guiones, puntos o comas) como fechas o decimales)
-            |(?:[A-Za-z'áéíóúüñçàèìòùâêîôûäëïöü]+)                                 # Resto de palabras
+            |(?:[A-Za-záéíóúüñçàèìòùâêîôûäëïöü]+)                                 # Resto de palabras
             """,
             re.VERBOSE,
         )

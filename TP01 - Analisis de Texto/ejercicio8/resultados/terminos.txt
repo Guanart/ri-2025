@@ -1,80 +1,3 @@
-'' 92 80
-''a 2 2
-''ahora 3 3
-''aquélla 1 1
-''así 2 2
-''bien 1 1
-''cardenio 1 1
-''con 1 1
-''créame 1 1
-''cualquiera 1 1
-''dadme 1 1
-''de 2 2
-''debes 1 1
-''decid 1 1
-''decidme 1 1
-''digo 1 1
-''dé 1 1
-''ellos 1 1
-''en 4 4
-''esas 1 1
-''eso 1 1
-''este 1 1
-''gloria 1 1
-''gualá 1 1
-''hagan 1 1
-''hermana 1 1
-''hermano 2 2
-''hija 1 1
-''hijos 1 1
-''juro 1 1
-''la 1 1
-''las 1 1
-''lo 2 2
-''luengos 1 1
-''maravillado 1 1
-''mañana 1 1
-''mi 3 3
-''mil 1 1
-''mirad 3 3
-''mucho 1 1
-''ni 1 1
-''ninguno 2 2
-''no 12 12
-''paciencia 1 1
-''paz 1 1
-''pensar 1 1
-''perro 1 1
-''plega 1 1
-''poned 1 1
-''por 4 4
-''prenda 1 1
-''pues 4 4
-''quitádmele 1 1
-''quiérote 1 1
-''sancho 1 1
-''sembrad 1 1
-''sentaos 1 1
-''señor 3 3
-''señora 1 1
-''si 5 5
-''sin 2 2
-''sobrino 1 1
-''somos 1 1
-''sí 2 2
-''sí'' 1 1
-''tal 1 1
-''también 1 1
-''tan 2 2
-''tanto 1 1
-''todas 1 1
-''todo 2 2
-''tú 1 1
-''voy 1 1
-''vuestra 1 1
-''y 6 6
-''ya 2 2
-''yo 5 5
 1 47 37
 10 1 1
 1500 1 1
@@ -108,7 +31,7 @@
 84116 1 1
 9 3 3
 90 2 2
-a 9931 8394
+a 9933 8395
 a.b.c. 1 1
 abad 5 5
 abadejo 2 2
@@ -416,8 +339,7 @@ acertado 23 23
 acertados 1 1
 acertadísimo 1 1
 acertar 10 10
-acertara 4 4
-acertara'' 1 1
+acertara 5 5
 acertare 5 5
 acertares 1 1
 acertarle. 1 1
@@ -1238,7 +1160,7 @@ ahogaros 1 1
 ahoguen 1 1
 ahogó 4 4
 ahondar 1 1
-ahora 359 356
+ahora 362 359
 ahora. 4 4
 ahorcaba 1 1
 ahorcado 4 4
@@ -1247,7 +1169,7 @@ ahorcados 1 1
 ahorcamos 1 1
 ahorcan 1 1
 ahorcar 5 5
-ahorcarme'' 1 1
+ahorcarme 1 1
 ahorcarse 1 1
 ahorcase 1 1
 ahorquen 2 2
@@ -1453,8 +1375,7 @@ alcurnia 6 6
 alcuza 8 8
 alcántara 1 1
 alcázar 11 11
-alcázares 4 4
-alcázares'' 1 1
+alcázares 5 5
 alcé 2 2
 alcéis 1 1
 aldabazos 1 1
@@ -1556,8 +1477,7 @@ alguien 1 1
 alguna 358 354
 alguna. 28 28
 algunas 86 85
-alguno 126 125
-alguno'' 1 1
+alguno 127 126
 alguno. 16 16
 algunos 121 120
 algún 283 272
@@ -1611,11 +1531,9 @@ allende 1 1
 allento 1 1
 allombre 1 1
 allow 1 1
-allá 77 77
-allá'' 1 1
+allá 78 78
 allí 421 414
-alma 133 132
-alma'' 1 1
+alma 134 133
 alma. 19 19
 almacén 2 2
 almagre 1 1
@@ -2303,8 +2221,7 @@ apriesa. 1 1
 aprieta 9 9
 apriete 2 2
 aprietes 1 1
-aprieto 4 4
-aprieto'' 1 1
+aprieto 5 5
 aprieto. 1 1
 aprietos 1 1
 aprisa 1 1
@@ -2380,7 +2297,7 @@ aquestos 3 3
 aquiles 3 3
 aquista 1 1
 aquél 47 47
-aquélla 24 24
+aquélla 25 25
 aquéllas 5 5
 aquéllo 2 2
 aquéllos 18 18
@@ -2388,8 +2305,7 @@ aquésta 2 2
 aquéstas 1 1
 aquéste 3 3
 aquéstos 1 1
-aquí 515 506
-aquí'' 1 1
+aquí 516 507
 arabia 4 4
 arabias 1 1
 arado 3 3
@@ -2477,8 +2393,7 @@ ariosto 1 1
 ariosto. 1 1
 arise 1 1
 aristas 1 1
-aristóteles 4 4
-aristóteles'' 1 1
+aristóteles 5 5
 arlanza. 1 1
 arma 13 10
 arma. 1 1
@@ -2775,8 +2690,7 @@ asnales 1 1
 asnalmente 1 1
 asno 82 80
 asno. 6 6
-asnos 3 3
-asnos'' 1 1
+asnos 4 4
 asolados. 1 1
 asolase 1 1
 asolverle 1 1
@@ -2831,7 +2745,7 @@ asumpto 7 7
 asunto 3 3
 asuramos 1 1
 asustado 2 2
-así 1063 1053
+así 1065 1055
 asían 2 2
 at 13 13
 ata 4 4
@@ -3285,8 +3199,7 @@ añadís 1 1
 añasca 2 2
 añejo 1 1
 año 47 47
-años 136 136
-años'' 1 1
+años 137 137
 añudada 1 1
 añudadas 1 1
 añudemos 1 1
@@ -3394,10 +3307,9 @@ baptizada 1 1
 baptizalla 1 1
 baraja 2 2
 barajan 1 1
-barajar'' 2 2
+barajar 2 2
 barata 4 4
-barataria 7 7
-barataria'' 1 1
+barataria 8 8
 barataria. 4 4
 baratario 1 1
 baratijas 2 2
@@ -3661,8 +3573,7 @@ besó 7 7
 besóla 1 1
 besóle 3 3
 betis 2 2
-bien 1040 1020
-bien'' 1 1
+bien 1042 1021
 bien. 9 9
 bienaventurada 1 1
 bienaventurado 2 2
@@ -3866,8 +3777,7 @@ bravos 6 6
 brazas 3 3
 brazo 70 70
 brazo. 5 5
-brazos 87 87
-brazos'' 1 1
+brazos 88 88
 brazos. 3 3
 breach 2 1
 brebaje 5 5
@@ -3876,8 +3786,7 @@ bretones 1 1
 breva 1 1
 breve 17 17
 breve. 1 1
-brevedad 16 16
-brevedad'' 1 1
+brevedad 17 17
 brevedad. 3 3
 brevemente 7 7
 brevemente. 1 1
@@ -4085,8 +3994,7 @@ caballos 24 24
 caballos. 1 1
 cabañas 2 2
 cabe 9 9
-cabecera 10 10
-cabecera'' 1 1
+cabecera 11 11
 cabelleras 2 2
 cabello 3 3
 cabello. 1 1
@@ -4403,8 +4311,7 @@ cantes 1 1
 cantidad 19 19
 cantidad. 4 4
 cantillana 1 1
-cantillo 1 1
-cantillo'' 1 1
+cantillo 2 2
 cantimploras 1 1
 canto 18 18
 canto. 2 2
@@ -4478,7 +4385,7 @@ cardado 2 2
 cardenal 2 2
 cardenal. 1 1
 cardenales 2 2
-cardenio 94 92
+cardenio 95 93
 cardenio. 3 3
 cardinales 1 1
 carece 2 2
@@ -4584,10 +4491,9 @@ carátula 1 1
 carísimo 2 2
 carísimos 2 2
 carón 1 1
-casa 311 309
+casa 312 309
 casa otomana 1 1
 casa santa 1 1
-casa'' 1 1
 casa. 21 21
 casaba 2 2
 casaca 3 3
@@ -4630,8 +4536,7 @@ casen 1 1
 casero 1 1
 caseros 1 1
 casi 115 114
-casilda 1 1
-casilda'' 1 1
+casilda 2 2
 casildea 9 9
 casillas 2 2
 caso 117 117
@@ -5069,8 +4974,7 @@ ciegan 2 2
 ciego 11 11
 ciegos 3 3
 ciegue 1 1
-cielo 237 236
-cielo'' 1 1
+cielo 238 237
 cielo. 14 14
 cielos 23 23
 cielos. 1 1
@@ -5086,8 +4990,7 @@ cierra 6 6
 cierre 3 3
 cierta 25 24
 ciertas 11 11
-cierto 117 116
-cierto'' 1 1
+cierto 118 117
 cierto. 4 4
 ciertos 15 15
 cifra 4 4
@@ -5616,7 +5519,7 @@ comíamos 1 1
 comían 4 4
 común 18 18
 comúnmente 10 10
-con 4274 3937
+con 4275 3938
 concavidad 4 4
 concavidades 1 1
 concebido 1 1
@@ -5669,7 +5572,7 @@ concierto 15 15
 concierto. 1 1
 conciértase 1 1
 concluida 1 1
-concluido'' 1 1
+concluido 1 1
 concluido. 1 1
 concluir 6 6
 conclusión 2 2
@@ -5866,7 +5769,7 @@ conocimos 1 1
 conociéndole 1 1
 conociéronle 1 1
 conociésedes 1 1
-conociésemos'' 1 1
+conociésemos 1 1
 conoció 31 31
 conocióle 1 1
 conociólos 1 1
@@ -6027,8 +5930,7 @@ contad 2 2
 contadas 2 2
 contadme 3 3
 contadnos 1 1
-contado 39 39
-contado'' 1 1
+contado 40 40
 contado. 3 3
 contador. 1 1
 contados 3 3
@@ -6165,8 +6067,7 @@ contrapuestas 1 1
 contrapuestos 2 2
 contrapunto 2 2
 contrapuntos 1 1
-contraria 10 10
-contraria'' 1 1
+contraria 11 11
 contrarias 1 1
 contrario 37 37
 contrario. 3 3
@@ -6610,8 +6511,7 @@ cristiandad 6 6
 cristianesca 1 1
 cristiano 63 61
 cristiano. 9 9
-cristianos 63 61
-cristianos'' 1 1
+cristianos 64 62
 cristianos. 6 6
 cristina 2 2
 cristo 3 3
@@ -6650,7 +6550,7 @@ cruzando 1 1
 cruzando. 1 1
 cruzar 2 2
 créalo 1 1
-créame 7 7
+créame 8 8
 créanme 1 1
 crédito 31 31
 crédulo 1 1
@@ -6687,7 +6587,7 @@ cualidad 1 1
 cualificada 1 1
 cualque 1 1
 cualquier 33 32
-cualquiera 36 36
+cualquiera 37 37
 cuan 7 7
 cuando 750 723
 cuando cardenio 1 1
@@ -6992,7 +6892,7 @@ dad 5 5
 dada 10 10
 dadas 8 8
 dadivoso 2 2
-dadme 7 7
+dadme 8 8
 dado 153 153
 dado. 9 9
 dador 2 2
@@ -7082,7 +6982,7 @@ daños 3 3
 dañosa 1 1
 dañoso 1 1
 dañó 1 1
-de 18404 14264
+de 18406 14265
 de dios 1 1
 de madrid 1 1
 de reinaldos 1 1
@@ -7098,7 +6998,7 @@ debe. 2 2
 debemos 6 6
 deben 49 48
 deber 3 3
-debes 19 19
+debes 20 20
 debida 9 9
 debida. 1 1
 debidas 2 2
@@ -7140,10 +7040,10 @@ decente 1 1
 decentes 1 1
 deceplinantes 2 2
 dechado 1 1
-decid 8 8
+decid 9 9
 decid sarra 1 1
 decidle 1 1
-decidme 12 12
+decidme 13 13
 deciembre 1 1
 decienden 2 2
 deciendo 2 2
@@ -7217,8 +7117,7 @@ decías 1 1
 decíase 2 2
 decírosla 1 1
 decírselo 4 4
-decís 51 51
-decís'' 1 1
+decís 52 52
 dedicado 1 1
 dedicaron 2 2
 dedicatoria 2 2
@@ -7396,8 +7295,7 @@ delitos. 1 1
 deliñada 1 1
 della 92 92
 della. 12 12
-dellas 30 29
-dellas'' 1 1
+dellas 31 30
 dellas. 3 3
 dello 14 14
 dello. 2 2
@@ -7628,8 +7526,7 @@ desatada 2 2
 desatadlo 1 1
 desatados 1 1
 desatamos 1 1
-desatar 2 2
-desatar'' 1 1
+desatar 3 3
 desatarle. 1 1
 desatarlos. 1 1
 desataros 1 1
@@ -7864,8 +7761,7 @@ deseamos 3 3
 deseamos. 1 1
 desean 7 7
 deseando 3 3
-desear 14 14
-desear'' 1 1
+desear 15 15
 desear. 3 3
 desearen. 1 1
 desearle 2 2
@@ -7911,8 +7807,7 @@ desencantada 7 7
 desencantado 1 1
 desencantados 2 2
 desencantar 5 5
-desencantarla 1 1
-desencantarla'' 1 1
+desencantarla 2 2
 desencantarla. 1 1
 desencantase 1 1
 desencantase. 1 1
@@ -8102,8 +7997,7 @@ desmayaba 3 3
 desmayada 16 16
 desmayada. 3 3
 desmayadas 1 1
-desmayado 4 4
-desmayado'' 1 1
+desmayado 5 5
 desmayados 3 3
 desmayar 1 1
 desmayarse 2 2
@@ -8569,8 +8463,7 @@ diera 31 31
 diera. 1 1
 dieran 6 6
 dieras 2 2
-diere 14 14
-diere'' 1 1
+diere 15 15
 diere. 2 2
 dieren 11 10
 dieres. 1 1
@@ -8628,7 +8521,7 @@ dignidad 6 6
 digno 14 14
 dignos 13 13
 dignísima 1 1
-digo 320 320
+digo 321 321
 digo. 2 2
 digresiones 2 2
 digresiones. 1 1
@@ -8707,9 +8600,8 @@ dio. 1 1
 diole 15 15
 dioles 1 1
 diome 2 2
-dios 480 475
+dios 482 477
 dios nuestro se 4 4
-dios'' 2 2
 dios. 6 6
 diosa 2 2
 dioscórides 1 1
@@ -9215,7 +9107,7 @@ dásela 1 1
 dáselos 1 1
 dátil 1 1
 dátiles 1 1
-dé 83 82
+dé 84 83
 débelo 1 1
 débil 1 1
 débiles 1 1
@@ -9454,7 +9346,7 @@ ellas 120 119
 ellas. 7 7
 ello 102 102
 ello. 10 10
-ellos 285 279
+ellos 286 280
 ellos. 9 9
 elocución 2 2
 elocuencia 2 2
@@ -9606,7 +9498,7 @@ empuñando 1 1
 empuñar 1 1
 empuñará 1 1
 empuñó 2 2
-en 8277 7310
+en 8281 7314
 en dios 1 1
 en florencia 1 1
 en madrid 2 2
@@ -9719,7 +9611,7 @@ encarecer 3 3
 encarecer. 3 3
 encarecerlas 1 1
 encarecerlo. 2 2
-encarecerlos'' 1 1
+encarecerlos 1 1
 encarecerlos. 1 1
 encarecerte 1 1
 encarecida 2 2
@@ -10247,8 +10139,7 @@ entiende 20 20
 entiende. 1 1
 entienden 6 6
 entiendes 3 3
-entiendo 41 40
-entiendo'' 1 1
+entiendo 42 41
 entiendo. 4 4
 entierran 1 1
 entierre 1 1
@@ -10295,8 +10186,7 @@ entraran 1 1
 entrarle 1 1
 entrarme 1 1
 entrarnos 2 2
-entraron 32 32
-entraron'' 1 1
+entraron 33 33
 entraron. 1 1
 entraros 1 1
 entrarse 3 3
@@ -10519,14 +10409,13 @@ eruditos 1 1
 erutaciones 1 1
 erutar 6 6
 eróstrato 1 1
-es 2140 2030
-es'' 1 1
+es 2141 2031
 es. 4 4
 esa 95 95
 esa ang 1 1
 esa teresa panza 1 1
 esaminadores 1 1
-esas 46 46
+esas 47 47
 escabroso 1 1
 escala 1 1
 escalas 1 1
@@ -10847,7 +10736,7 @@ eslabonando 1 1
 eslabón 2 1
 esme 1 1
 esmeraldas 3 3
-eso 332 330
+eso 333 331
 eso dios 1 1
 eso. 1 1
 esorbitante 1 1
@@ -11007,8 +10896,7 @@ esponja 1 1
 esposa 45 45
 esposa. 6 6
 esposas 3 3
-esposo 48 47
-esposo'' 1 1
+esposo 49 48
 esposo. 8 8
 espresa 1 1
 espreso 1 1
@@ -11060,8 +10948,7 @@ estacada 5 5
 estacas 15 15
 estacas. 1 1
 estacazos 1 1
-estaciones 1 1
-estaciones'' 1 1
+estaciones 2 2
 estad 1 1
 estada 2 2
 estadme 3 3
@@ -11106,7 +10993,7 @@ estatura 1 1
 estaturas. 1 1
 estatutos 1 1
 estaño 3 3
-este 641 626
+este 642 627
 este gin 1 1
 estemos 5 5
 estender 6 6
@@ -11302,8 +11189,7 @@ estuve 7 7
 estuviera 20 20
 estuvieran 1 1
 estuvieras 2 2
-estuviere 6 6
-estuviere'' 1 1
+estuviere 7 7
 estuviere. 1 1
 estuvieren 1 1
 estuvieres 1 1
@@ -11315,8 +11201,7 @@ estuvimos 6 6
 estuviésedes 1 1
 estuviésemos 1 1
 estuvo 58 58
-está 441 436
-está'' 1 1
+está 442 437
 estábale 2 2
 estábamos 8 8
 estábanle 1 1
@@ -11672,8 +11557,7 @@ fendientes 1 1
 fenecer 2 2
 feneció 1 1
 fenestras 1 1
-feo 10 9
-feo'' 1 1
+feo 11 10
 feos 4 4
 feria 1 1
 feriar 1 1
@@ -12428,8 +12312,7 @@ give 4 4
 given 1 1
 giù 1 1
 globo 1 1
-gloria 40 40
-gloria'' 1 1
+gloria 42 42
 gloria. 3 3
 glorias 3 3
 gloriosa 1 1
@@ -12510,8 +12393,7 @@ gordos 1 1
 gordura 3 3
 gorjear 1 1
 gorra 3 3
-gota 5 5
-gota'' 1 1
+gota 6 6
 gotas 2 2
 govern 1 1
 goza 1 1
@@ -12662,6 +12544,7 @@ guadameciles 1 1
 guadarrama. 1 1
 guadaña 1 1
 guadiana 7 7
+gualá 1 1
 guante 2 2
 guantero 1 1
 guarda 28 28
@@ -12674,8 +12557,7 @@ guardaban. 1 1
 guardad 1 1
 guardada 5 5
 guardada. 3 3
-guardadas 1 1
-guardadas'' 1 1
+guardadas 2 2
 guardadas. 1 1
 guardado 12 12
 guardados 2 2
@@ -12850,8 +12732,7 @@ haberse 22 22
 haberte 3 3
 habido 23 23
 habiendo 86 86
-habilidad 14 14
-habilidad'' 1 1
+habilidad 15 15
 habilidad. 1 1
 habilidades 12 12
 habilitado 1 1
@@ -13020,7 +12901,7 @@ haga 72 72
 haga. 3 3
 hagamos 3 3
 hagamos. 1 1
-hagan 12 12
+hagan 13 13
 hagan. 1 1
 hagas 10 10
 hago 64 64
@@ -13094,8 +12975,7 @@ halle. 2 2
 hallemos 3 3
 hallen 4 4
 halles 1 1
-hallo 27 27
-hallo'' 1 1
+hallo 28 28
 hallo. 3 3
 halláis 3 3
 hallámonos 1 1
@@ -13117,8 +12997,7 @@ hallóla 1 1
 hallóle 7 7
 hallóse 3 3
 halo 2 2
-hambre 53 53
-hambre'' 1 1
+hambre 54 54
 hambre. 5 5
 hambrientas 1 1
 hambriento 2 2
@@ -13202,8 +13081,7 @@ hechicero 5 5
 hechicero. 1 1
 hechiceros 3 3
 hechizos 1 1
-hecho 257 256
-hecho'' 1 1
+hecho 258 257
 hecho. 14 14
 hechos 38 38
 hechos. 5 5
@@ -13255,13 +13133,13 @@ herirle 1 1
 herirles 1 1
 herirnos. 1 1
 herirse 1 1
-hermana 8 8
+hermana 9 9
 hermana. 2 2
 hermanas 4 4
 hermandad 4 4
 hermandad. 3 3
 hermandades 1 1
-hermano 101 101
+hermano 103 103
 hermano sancho 1 1
 hermano. 2 2
 hermanos 19 19
@@ -13343,7 +13221,7 @@ higa. 1 1
 higas 1 1
 higo 1 1
 higos 1 1
-hija 155 155
+hija 156 156
 hija. 7 7
 hijas 10 10
 hijitos 1 1
@@ -13351,7 +13229,7 @@ hijo 97 97
 hijo sancho 1 1
 hijo. 2 2
 hijodalgo 2 2
-hijos 53 53
+hijos 54 54
 hijos. 8 8
 hilachas 1 1
 hilando 1 1
@@ -13402,8 +13280,7 @@ historiado 1 1
 historiador 13 13
 historiadores 7 7
 historiadores. 1 1
-historias 48 48
-historias'' 1 1
+historias 49 49
 historias. 2 2
 hito 10 7
 hito. 1 1
@@ -13538,8 +13415,7 @@ horcajadas 3 3
 horcajadura 1 1
 horizonte 2 2
 horma 1 1
-hormiga 1 1
-hormiga'' 1 1
+hormiga 2 2
 hormiga. 1 1
 hormigas 1 1
 horno 1 1
@@ -13593,8 +13469,7 @@ huella 1 1
 huellas 2 2
 hueso 12 12
 hueso. 1 1
-huesos 16 16
-huesos'' 1 1
+huesos 17 17
 huesos. 1 1
 huevo 2 2
 huevos 7 7
@@ -14154,8 +14029,7 @@ infundir 1 1
 infundió 3 3
 ingalaterra 6 6
 ingeniero 1 1
-ingenio 43 43
-ingenio'' 1 1
+ingenio 44 44
 ingenio. 3 3
 ingenios 11 11
 ingeniosa 1 1
@@ -14415,8 +14289,7 @@ jadeando 2 2
 jaeces 3 3
 jaez 21 21
 jaldes 1 1
-jamás 142 142
-jamás'' 1 1
+jamás 143 143
 jamón 1 1
 janto 1 1
 january 1 1
@@ -14546,8 +14419,7 @@ juntas. 1 1
 juntase 1 1
 junten 2 2
 juntillas. 1 1
-junto 106 105
-junto'' 1 1
+junto 107 106
 junto. 1 1
 juntos 34 33
 juntos. 3 3
@@ -14575,7 +14447,7 @@ juridición 7 7
 jurisconsultos. 1 1
 jurisdición 1 1
 jurisperito 2 2
-juro 31 31
+juro 32 32
 juro. 2 2
 juré 2 2
 jurídicamente 1 1
@@ -14627,7 +14499,7 @@ keeping 2 2
 kind 1 1
 know 1 1
 l 31 31
-la 10469 8730
+la 10470 8731
 la alejandra 1 1
 la austr 1 1
 la carolea 1 1
@@ -14752,7 +14624,7 @@ largas 12 12
 largo 42 39
 largo. 2 2
 largos 6 6
-las 3482 3165
+las 3483 3166
 las cortes 3 3
 lascivia 1 1
 lascivia. 1 1
@@ -14865,8 +14737,7 @@ legión 1 1
 lego 1 1
 legua 22 22
 legua. 3 3
-leguas 32 32
-leguas'' 1 1
+leguas 33 33
 leguas. 6 6
 legítima 8 8
 legítimamente 1 1
@@ -15012,8 +14883,7 @@ liberalidad 18 18
 liberalidad. 2 2
 liberalidades 1 1
 liberalmente 3 3
-libertad 75 75
-libertad'' 1 1
+libertad 76 76
 libertad. 7 7
 libertada 1 1
 libertades 1 1
@@ -15038,8 +14908,7 @@ libraré 1 1
 libraría 1 1
 libras 5 5
 librase 4 4
-libre 56 55
-libre'' 1 1
+libre 57 56
 libre. 2 2
 librea 5 5
 libreas 8 8
@@ -15103,7 +14972,7 @@ limitado 1 1
 limitados 2 2
 limitation 3 3
 limited 5 5
-limiten'' 1 1
+limiten 1 1
 limosna 6 6
 limosna. 1 1
 limpia 14 13
@@ -15480,7 +15349,7 @@ llévense 1 1
 llévese 1 1
 llévete 1 1
 llévola 1 1
-lo 3490 3238
+lo 3492 3240
 loa 1 1
 loable 2 2
 loables 2 2
@@ -15562,7 +15431,7 @@ luego. 4 4
 luenga 4 4
 luengas 3 3
 luengo 3 3
-luengos 12 12
+luengos 13 13
 lueñas 1 1
 lueñes 3 3
 lugar 338 337
@@ -15743,9 +15612,8 @@ makes 1 1
 mal 456 437
 mal ag 1 1
 mal. 6 6
-mala 127 127
+mala 128 128
 mala figura 1 1
-mala'' 1 1
 mala. 4 4
 malae. 1 1
 malambruno 18 18
@@ -16048,7 +15916,7 @@ maravedís 17 17
 maravilla 19 19
 maravilla. 2 2
 maravillaba 2 2
-maravillado 6 6
+maravillado 7 7
 maravillado. 1 1
 maravillados 1 1
 maravillan 1 1
@@ -16099,8 +15967,7 @@ margen 8 8
 mari guti 3 3
 mari sancha 3 3
 marica 2 2
-marido 70 70
-marido'' 1 1
+marido 71 71
 marido. 7 7
 maridos 3 3
 maridos. 1 1
@@ -16216,7 +16083,7 @@ mazorca 1 1
 mazorcas 1 1
 mazos 5 5
 maña 6 6
-mañana 85 85
+mañana 86 86
 mañas 2 2
 mañero 2 2
 mañeruelas 1 1
@@ -16346,8 +16213,7 @@ menearán 1 1
 menease 1 1
 meneo 2 2
 meneses 1 1
-menester 133 132
-menester'' 1 1
+menester 134 133
 menester. 14 14
 menesteres 2 2
 menesterosa 7 7
@@ -16433,8 +16299,7 @@ mercadería 1 1
 mercaduría 1 1
 mercancía 4 4
 mercancías 1 1
-merced 881 877
-merced'' 2 2
+merced 883 879
 merced. 17 17
 mercedes 72 72
 mercedes. 4 4
@@ -16449,8 +16314,7 @@ merecen. 5 5
 merecer 1 1
 merecerla 1 1
 merecerlo 3 3
-mereces 1 1
-mereces'' 1 1
+mereces 2 2
 merecida 1 1
 merecidas 1 1
 merecido 6 6
@@ -16549,7 +16413,7 @@ mezquino 3 3
 mezquitas 1 1
 meón 1 1
 meótides 1 1
-mi 1702 1585
+mi 1705 1587
 miau 1 1
 micael verino 1 1
 micer 1 1
@@ -16591,7 +16455,7 @@ migas 4 4
 miglior 1 1
 miguel 16 16
 miguel turra 4 4
-mil 191 179
+mil 192 180
 milagro 25 22
 milagro. 2 2
 milagros 15 14
@@ -16634,7 +16498,7 @@ miraba 20 20
 miraba sancho 2 2
 miraban 13 13
 miraban. 7 7
-mirad 43 43
+mirad 46 46
 mirada 1 1
 miradas 1 1
 miradlo 1 1
@@ -16713,11 +16577,9 @@ misericordia. 1 1
 misericordias 3 3
 misericordiosos 1 1
 misiva 1 1
-misma 76 75
-misma'' 1 1
+misma 77 76
 mismas 14 14
-mismo 175 174
-mismo'' 1 1
+mismo 176 175
 mismo. 2 2
 mismos 14 14
 mismísimos 1 1
@@ -16814,8 +16676,7 @@ momentos. 2 2
 momia 1 1
 momia. 2 2
 mona 2 2
-monacillo 1 1
-monacillo'' 1 1
+monacillo 2 2
 monarca 6 5
 monarcas 2 2
 monarquía 1 1
@@ -16832,8 +16693,7 @@ mondo 1 1
 mondos 3 3
 mondoñedo 1 1
 mondándose 1 1
-moneda 10 10
-moneda'' 1 1
+moneda 11 11
 monedas 1 1
 monesterio 11 11
 money 3 3
@@ -16867,8 +16727,7 @@ montañas 19 19
 montañuela 1 1
 montañuelas 1 1
 montañés 1 1
-monte 19 18
-monte'' 1 1
+monte 20 19
 monte. 1 1
 montemayor 3 3
 montera 7 7
@@ -16925,8 +16784,7 @@ moriscos 3 3
 morisma 3 3
 moro 47 47
 moro. 2 2
-moros 50 47
-moros'' 1 1
+moros 51 48
 moros. 1 1
 morrión 6 6
 mors 1 1
@@ -17040,8 +16898,7 @@ muchachos 16 16
 muchas 242 240
 muchas. 2 2
 muchedumbre 6 6
-mucho 288 281
-mucho'' 1 1
+mucho 290 283
 mucho. 5 5
 muchos 194 192
 muchos. 7 7
@@ -17095,13 +16952,11 @@ muero 6 6
 muerta 23 22
 muertas 5 4
 muertas. 1 1
-muerte 133 133
-muerte'' 1 1
+muerte 134 134
 muerte. 18 18
 muertes 3 3
 muertes. 1 1
-muerto 96 96
-muerto'' 1 1
+muerto 97 97
 muerto. 11 11
 muertos 9 9
 muertos. 2 2
@@ -17119,8 +16974,7 @@ mueve 9 9
 mueven 1 1
 mugre 1 1
 mugriento 1 1
-mujer 224 222
-mujer'' 1 1
+mujer 225 223
 mujer. 4 4
 mujercilla 1 1
 mujercillas 2 2
@@ -17140,8 +16994,7 @@ muley hamida 1 1
 mulos 2 2
 multitud 3 3
 multos 1 1
-mundo 314 312
-mundo'' 4 4
+mundo 318 316
 mundo. 77 77
 mundos 3 3
 mundos. 1 1
@@ -17239,8 +17092,7 @@ mínima 7 7
 mínimas 3 3
 mínimo 1 1
 mínimos 1 1
-mío 188 187
-mío'' 1 1
+mío 189 188
 míos 39 39
 mírala 2 2
 mírate 1 1
@@ -17413,7 +17265,7 @@ network 1 1
 new 3 3
 newsletter 1 1
 ngel 3 3
-ni 1375 1120
+ni 1376 1120
 ni sancho 1 1
 niarros 1 1
 nicolao 1 1
@@ -17438,7 +17290,7 @@ ninfas 8 8
 ninguna 140 140
 ninguna. 1 1
 ningunas 7 7
-ninguno 93 93
+ninguno 95 95
 ninguno. 5 5
 ningunos 2 2
 ningún 61 60
@@ -17453,7 +17305,7 @@ niñerías 15 15
 niñez 1 1
 niño 8 7
 niños 9 9
-no 6334 5845
+no 6346 5854
 no. 10 10
 nobis. 1 1
 noble 16 16
@@ -17475,16 +17327,14 @@ nombrar 13 13
 nombrarle 1 1
 nombrase 1 1
 nombrastes. 1 1
-nombre 173 170
-nombre'' 1 1
+nombre 174 171
 nombre. 7 7
 nombres 28 28
 nombro 1 1
 nombráis 1 1
 nombráredes 1 1
 nombró 5 5
-non 10 10
-non'' 1 1
+non 11 11
 nona 1 1
 nonada 3 3
 nones 4 3
@@ -17562,9 +17412,8 @@ nudo 7 7
 nudos 1 1
 nueces 5 5
 nueso 1 1
-nuestra 137 134
+nuestra 138 135
 nuestra se 5 5
-nuestra'' 1 1
 nuestra. 2 2
 nuestramo 1 1
 nuestras 46 46
@@ -17837,8 +17686,7 @@ ojeándole 1 1
 ojinegra 1 1
 ojo 18 18
 ojo. 1 1
-ojos 267 266
-ojos'' 1 1
+ojos 268 267
 ojos. 17 17
 olalla 2 2
 olas 1 1
@@ -18148,7 +17996,7 @@ pa 1 1
 pablo 2 2
 pacer 4 4
 paces 5 5
-paciencia 36 36
+paciencia 37 37
 paciencia. 1 1
 paciendo 3 3
 paciente 1 1
@@ -18387,8 +18235,7 @@ parecerse 1 1
 parecerá 2 2
 parecerás 1 1
 pareces 2 2
-parecido 25 25
-parecido'' 2 2
+parecido 27 27
 parecido. 2 2
 parecidos 1 1
 pareciendo 1 1
@@ -18651,14 +18498,13 @@ pavés 1 1
 pay 1 1
 paying 3 3
 payments 3 3
-paz 58 56
+paz 59 57
 pazpuerca 1 1
 pañales 1 1
 pañizuelo 4 4
 paño 24 23
 paños 1 1
-pañuelo 4 4
-pañuelo'' 1 1
+pañuelo 5 5
 peana 2 2
 pecaba 1 1
 pecado 24 23
@@ -18850,7 +18696,7 @@ pensamientos. 10 10
 pensamos 3 3
 pensamos. 1 1
 pensando 16 16
-pensar 87 87
+pensar 88 88
 pensar. 1 1
 pensara 3 3
 pensaren 1 1
@@ -19048,7 +18894,7 @@ perricos 1 1
 perrilla 1 1
 perrillo 1 1
 perritas 1 1
-perro 17 17
+perro 18 18
 perroquia 1 1
 perros 12 12
 persas 2 2
@@ -19393,7 +19239,7 @@ plebeyos 1 1
 plectio. 1 1
 plectro 1 1
 plectro. 1 1
-plega 10 10
+plega 11 11
 plegar 1 1
 plegaria 1 1
 plegarias 6 6
@@ -19536,6 +19382,7 @@ pondría 10 10
 pondríala 1 1
 pone 31 31
 pone. 1 1
+poned 1 1
 ponedla 1 1
 ponedme 1 1
 ponella 2 2
@@ -19592,7 +19439,7 @@ popa 3 3
 popa. 2 2
 popen 1 1
 poquito 2 2
-por 3925 3610
+por 3929 3613
 por dios 15 15
 por marcela 1 1
 porcia 1 1
@@ -19820,7 +19667,7 @@ premio. 1 1
 premios 4 4
 premática 3 3
 premáticas 2 2
-prenda 9 9
+prenda 10 10
 prendan 1 1
 prendas 13 13
 prendas. 2 2
@@ -20169,8 +20016,7 @@ pronunciarle 1 1
 pronunció 1 1
 proofread 1 1
 property 2 2
-propia 12 12
-propia'' 1 1
+propia 13 13
 propiamente 1 1
 propias 9 9
 propias. 2 2
@@ -20194,8 +20040,7 @@ proprietary 1 1
 proprio 5 5
 proprio. 2 2
 proprios 3 3
-propuesto 4 4
-propuesto'' 1 1
+propuesto 5 5
 propusieran 1 1
 propuso 15 15
 propósito 47 47
@@ -20234,8 +20079,7 @@ protected 5 5
 protestaba 1 1
 protesto 1 1
 protoencantador 1 1
-provecho 51 51
-provecho'' 1 1
+provecho 52 52
 provecho. 8 8
 provechosa 1 1
 provechosas 3 3
@@ -20358,7 +20202,7 @@ puertas 27 27
 puertas. 2 2
 puerto 20 20
 puertos 3 3
-pues 860 856
+pues 864 860
 pues. 1 1
 puesta 49 49
 puesta. 1 1
@@ -20701,8 +20545,7 @@ quieren 40 40
 quieren. 6 6
 quieres 52 51
 quieres. 1 1
-quiero 258 255
-quiero'' 1 1
+quiero 259 256
 quiero. 2 2
 quierénse 1 1
 quieta 2 2
@@ -20737,8 +20580,7 @@ quinientos 6 6
 quinta 3 3
 quintaesencia 1 1
 quintanar. 2 2
-quintañona 4 4
-quintañona'' 1 1
+quintañona 5 5
 quinto 7 7
 quinto. 1 1
 quirieleisón 1 1
@@ -20823,6 +20665,7 @@ quiteria 36 35
 quiteria. 3 3
 quito 6 6
 quitábale 1 1
+quitádmele 1 1
 quitámossele 1 1
 quitándola 1 1
 quitándole 5 5
@@ -20855,7 +20698,7 @@ quiéreste 1 1
 quiérola 1 1
 quiérole 2 2
 quiéroos 1 1
-quiérote 2 2
+quiérote 3 3
 quiñones 4 4
 qué 849 766
 quédate 4 4
@@ -21011,8 +20854,7 @@ readable 2 2
 reading 1 1
 real 42 42
 real. 4 4
-reales 46 45
-reales'' 1 1
+reales 47 46
 reales. 8 8
 realidad 1 1
 realmente 10 10
@@ -21340,8 +21182,7 @@ reinase 1 1
 reincorporóse 1 1
 reino 65 65
 reino. 7 7
-reinos 22 22
-reinos'' 1 1
+reinos 23 23
 reinos. 4 4
 reiteraban 1 1
 reiterar 3 3
@@ -21588,8 +21429,7 @@ representaba 4 4
 representaban 4 4
 representaciones 1 1
 representadas 4 4
-representado 1 1
-representado'' 1 1
+representado 2 2
 representado. 1 1
 representallas 1 1
 representamos. 1 1
@@ -22183,8 +22023,7 @@ rondar 1 1
 rondilla 1 1
 rondón 2 2
 ronquilla 1 1
-ropa 17 17
-ropa'' 1 1
+ropa 18 18
 ropa. 2 2
 ropas 4 4
 ropilla 5 5
@@ -22441,8 +22280,7 @@ salamanca 13 13
 salamanca. 2 2
 salamanquesa 1 1
 salar 1 1
-salario 17 17
-salario'' 1 1
+salario 18 18
 salarios 4 4
 salas 2 2
 salas. 1 1
@@ -22471,8 +22309,7 @@ salido 38 38
 saliendo 12 12
 saliera 6 6
 salieran 1 1
-saliere 2 2
-saliere'' 2 2
+saliere 4 4
 salieron 32 32
 saliese 23 23
 saliesen 5 5
@@ -22589,7 +22426,7 @@ sancha. 1 1
 sanchica 19 19
 sanchica. 2 2
 sanchico 1 1
-sancho 1807 1790
+sancho 1808 1791
 sancho bienaya 1 1
 sancho dorotea 1 1
 sancho panza 253 253
@@ -22736,8 +22573,7 @@ scilas 1 1
 scitas 1 1
 scripserunt 1 1
 se 4758 4443
-sea 276 272
-sea'' 1 1
+sea 277 273
 sea. 7 7
 seamos 6 6
 sean 79 79
@@ -22836,6 +22672,7 @@ semanas 1 1
 semblante 4 4
 semblantes 1 1
 sembraba 1 1
+sembrad 1 1
 sembrada 1 1
 sembradas 1 1
 sembradura 1 1
@@ -22874,7 +22711,7 @@ sent 1 1
 sentada 7 7
 sentado 24 24
 sentados 3 3
-sentaos 1 1
+sentaos 2 2
 sentar 10 10
 sentaron 10 10
 sentaron. 1 1
@@ -23066,9 +22903,8 @@ señalo 1 1
 señalé 1 1
 señaló 1 1
 señas 41 41
-señor 1045 1029
-señora 510 504
-señora'' 1 1
+señor 1048 1032
+señora 512 506
 señoras 50 50
 señorazos 1 1
 señorea 1 1
@@ -23088,7 +22924,7 @@ share 1 1
 shared 1 1
 sharing 1 1
 should 1 1
-si 1961 1905
+si 1966 1910
 si dios 1 1
 si rold 1 1
 sicilia 3 3
@@ -23200,7 +23036,7 @@ simplicidades. 1 1
 simplicísimo 1 1
 simulacro 1 1
 simón 1 1
-sin 1156 1112
+sin 1158 1114
 sinabafas 1 1
 sincera 2 2
 sincero 2 2
@@ -23324,7 +23160,7 @@ sobrevista 1 1
 sobrina 58 58
 sobrina. 2 2
 sobrinas 3 3
-sobrino 6 6
+sobrino 7 7
 sobró 1 1
 socaliñado 1 1
 socaliñas 2 2
@@ -23364,8 +23200,7 @@ soga. 1 1
 sogas 3 3
 soguilla 4 4
 sois 57 56
-sol 75 75
-sol'' 1 1
+sol 76 76
 sol. 2 2
 sola 60 60
 sola. 1 1
@@ -23463,7 +23298,7 @@ sombrero 6 6
 sombrosos 1 1
 sombríos 1 1
 some 1 1
-somos 30 27
+somos 31 28
 somos. 1 1
 son 483 474
 son. 2 2
@@ -23915,7 +23750,7 @@ sélo 1 1
 séos 1 1
 séptima 1 1
 séte 2 2
-sí 343 340
+sí 346 343
 síes 1 1
 sígame 1 1
 síguelos 1 1
@@ -23968,10 +23803,9 @@ tajar 1 1
 tajo 8 8
 tajos 1 1
 takes 1 1
-tal 427 409
+tal 428 410
 taladrar 1 1
-talante 21 21
-talante'' 1 1
+talante 22 22
 talante. 2 2
 talegas 3 3
 talegazos 1 1
@@ -23985,7 +23819,7 @@ talle 22 22
 tamaña 4 4
 tamaño 7 6
 tamaños 2 2
-también 233 232
+también 234 233
 tambor. 1 1
 tambores 7 7
 tamboril 1 1
@@ -23994,7 +23828,7 @@ tamborinos 3 3
 tamborín 1 1
 tampoco 26 26
 tampoco. 3 3
-tan 1242 1121
+tan 1244 1123
 tan. 1 1
 tanda 4 4
 tanta 150 148
@@ -24007,7 +23841,7 @@ tanteo 1 1
 tanteó 1 1
 tantica 1 1
 tantico 3 3
-tanto 411 403
+tanto 412 404
 tanto. 9 9
 tantos 99 97
 tantum 1 1
@@ -24225,8 +24059,7 @@ tengamos 6 6
 tengan 18 18
 tengan. 1 1
 tengas 10 10
-tengo 391 385
-tengo'' 1 1
+tengo 392 386
 tengo. 10 10
 tengáis 6 6
 tenida 3 3
@@ -24365,8 +24198,7 @@ tiene 378 378
 tiene. 11 11
 tienen 145 145
 tienen. 3 3
-tienes 58 57
-tienes'' 1 1
+tienes 59 58
 tienes. 1 1
 tientas 1 1
 tientes 1 1
@@ -24377,8 +24209,7 @@ tiernamente 4 4
 tiernas 4 4
 tierno 7 7
 tiernos 7 7
-tierra 240 235
-tierra'' 1 1
+tierra 241 236
 tierra. 34 34
 tierras 10 10
 tierras. 1 1
@@ -24457,8 +24288,7 @@ tobo 1 1
 tobosa 1 1
 tobosescas 1 1
 tobosina 1 1
-toboso 142 140
-toboso'' 1 1
+toboso 143 141
 toboso. 22 22
 toca 48 47
 tocaba 19 19
@@ -24498,11 +24328,10 @@ tocárades 1 1
 tocó 2 2
 toda 320 314
 toda. 3 3
-todas 371 364
+todas 372 365
 todas. 2 2
 todavía 47 47
-todo 1156 1120
-todo'' 1 1
+todo 1159 1123
 todo. 22 22
 todopoderoso 3 3
 todos 800 774
@@ -24631,8 +24460,7 @@ torcido 4 4
 torcidos 1 1
 torciendo 2 2
 torció 2 2
-tordesillas 1 1
-tordesillas'' 1 1
+tordesillas 2 2
 tordesillas. 2 2
 tordesillesco 1 1
 tordilla 2 2
@@ -25238,7 +25066,7 @@ tómese 1 1
 tón 1 1
 tórnale 1 1
 tórnote 1 1
-tú 264 256
+tú 265 257
 túmulo 8 8
 túnez 3 3
 túnica 2 2
@@ -25744,8 +25572,7 @@ veras 38 38
 veras. 2 2
 verbis 2 2
 verbos 1 1
-verdad 424 417
-verdad'' 1 1
+verdad 425 418
 verdad. 11 11
 verdadera 51 51
 verdadera. 2 2
@@ -25812,8 +25639,7 @@ veráslo 1 1
 veráslos 1 1
 verásme 1 1
 veré 5 5
-veréis 18 18
-veréis'' 1 1
+veréis 19 19
 veréislo 1 1
 veréisos 1 1
 verémonos 1 1
@@ -25876,8 +25702,7 @@ viciosa 1 1
 vicioso 5 4
 viciosos 2 2
 victoria 1 1
-vida 294 293
-vida'' 3 3
+vida 297 296
 vida. 61 61
 vidas 13 13
 vidas. 1 1
@@ -26163,8 +25988,7 @@ volteando 2 2
 voltearle 1 1
 volume 1 1
 volumen 3 3
-voluntad 142 141
-voluntad'' 1 1
+voluntad 143 142
 voluntad. 17 17
 voluntades 5 5
 voluntades. 2 2
@@ -26239,21 +26063,19 @@ voquibles 1 1
 vos 210 206
 vos. 2 2
 vosotras 4 4
-vosotros 28 28
-vosotros'' 1 1
+vosotros 29 29
 vosotros. 1 1
 votaba 1 1
 voto 25 25
 voto. 2 2
 votos 4 4
-voy 50 50
+voy 51 51
 voz 178 178
 voz. 1 1
 vuela 3 3
 vuelo 6 6
 vuelos 1 1
-vuelta 30 30
-vuelta'' 1 1
+vuelta 31 31
 vueltas 6 6
 vuelto 45 45
 vuelto. 2 2
@@ -26265,12 +26087,11 @@ vuelvas. 1 1
 vuelve 29 28
 vuelven 15 15
 vuelves 4 4
-vuelvo 16 16
-vuelvo'' 1 1
+vuelvo 17 17
 vuesa 203 203
 vuesas 17 17
 vueso 1 1
-vuestra 828 818
+vuestra 829 819
 vuestra excelencia 17 17
 vuestra se 4 4
 vuestra. 1 1
@@ -26405,8 +26226,8 @@ xxxv. 2 2
 xxxvi. 2 2
 xxxvii. 2 2
 xxxviii. 2 2
-y 18266 14593
-ya 782 753
+y 18272 14598
+ya 784 755
 ya. 1 1
 yace 9 9
 yacen 1 1
@@ -26431,8 +26252,7 @@ yelos 2 2
 yema 1 1
 yendo 29 29
 yerba 19 19
-yerbas 21 21
-yerbas'' 1 1
+yerbas 22 22
 yermos 1 1
 yerno 2 2
 yernos 1 1
@@ -26443,8 +26263,7 @@ yerro 5 5
 yerros 2 2
 yerros. 1 1
 yeso 1 1
-yo 2065 2019
-yo'' 2 2
+yo 2072 2026
 yo. 5 5
 yogar 1 1
 yogase 1 1
@@ -26542,7 +26361,7 @@ zánganos 1 1
 álcense 1 1
 ámbar 8 8
 ámbares 1 1
-ámexi'' 2 2
+ámexi 2 2
 án 15 15
 áncoras 1 1
 ándase 1 1
@@ -26574,8 +26393,7 @@ zánganos 1 1
 échese 3 3
 écloga 1 1
 églogas 3 3
-él 1251 1217
-él'' 2 2
+él 1253 1219
 élica 1 1
 émula 1 1
 émulo 2 2
@@ -26590,15 +26408,13 @@ zánganos 1 1
 és 1 1
 ésa 10 10
 ésas 6 6
-ése 11 11
-ése'' 1 1
+ése 12 12
 ésos 2 2
 ésta 78 75
 éstas 30 30
 éste 91 90
 éstos 35 35
-ía 11 11
-ía'' 1 1
+ía 12 12
 íada 1 1
 íbades 1 1
 íbamos 5 5
