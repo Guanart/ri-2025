@@ -6,9 +6,7 @@ from collections import Counter
 
 class IRSystemManual:
     """
-    Sistema de recuperación manual:
-    - build_doc_vectors()
-    - query(text, top_k)
+    Sistema de recuperación manual
     """
 
     def __init__(self, analyzer: CollectionAnalyzer):
@@ -30,7 +28,17 @@ class IRSystemManual:
                 vec
             )  # :contentReference[oaicite:9]{index=9}
 
+    def index_collection(self, path):
+        """
+        Indexa la colección de documentos en el directorio indicado.
+        """
+        self.analyzer.index_collection(path)
+
     def query(self, text, top_k=10):
+        """
+        Ejecuta una consulta sobre la colección indexada.
+        Devuelve los top_k documentos más relevantes.
+        """
         # Procesar query igual que un doc
         tokens = self.analyzer.tokenizer.tokenizar(text)
         q_tf = Counter(tokens)

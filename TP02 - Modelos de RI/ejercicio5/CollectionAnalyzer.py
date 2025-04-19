@@ -17,7 +17,7 @@ class CollectionAnalyzer:
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
         self.docs_terms = {}  # docid -> numero de tokens
-        self.df = {}  # término -> doc frequency
+        self.df = Counter()  # término -> doc frequency
         self.idf = {}  # término -> inverse doc freq
         self.term_index = {}  # término -> índice en vector
         self.N = 0  # total de documentos
@@ -41,10 +41,11 @@ class CollectionAnalyzer:
         self.N = len(self.docs_terms)   # Complejidad O(1)
 
         # Calcular DF e IDF
-        for term in {t for cnt in self.docs_terms.values() for t in cnt}:   # comprensión de conjunto -> conjunto de términos únicos
-            self.df[term] = sum(1 for cnt in self.docs_terms.values() if term in cnt)
+        for cnt in self.docs_terms.values():
+            for term in cnt.keys():
+                self.df[term] += 1
+        for term in self.df:
             self.idf[term] = math.log(self.N / self.df[term])   # por defecto usa logaritmo natural
-        # Complejidad O(N * M) donde N es el número de documentos y M el número de términos únicos
 
         # Mapear términos a índices de vector
         for i, term in enumerate(sorted(self.idf.keys())):
