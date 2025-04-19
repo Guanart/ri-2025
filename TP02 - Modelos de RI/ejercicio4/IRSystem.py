@@ -36,7 +36,7 @@ class IRSystem:
                             "text": text,
                         }  # Uso de yield para generar un iterable (iter) de diccionarios (gen_docs() es una función generadora)
 
-        if os.path.exists(self.index_path):
+        if os.path.exists(self.index_path + "/data.properties"):
             self.index = pt.IndexFactory.of(self.index_path + "/data.properties")
         else:
             indexer = pt.IterDictIndexer(

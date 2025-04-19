@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Author: Gonzalo Benito
 
+import time
 import pandas as pd
 from IRSystem import IRSystem
 import argparse
@@ -15,7 +16,7 @@ def main():
     parser.add_argument(
         "--dir-root",
         type=str,
-        required=True,  # Se requiere el argumento
+        required=True,
         help="Directorio raíz que contiene los archivos .html para la indexación.",
     )
     args = parser.parse_args()
@@ -26,11 +27,15 @@ def main():
         print(
             "Error: Debes proporcionar el argumento '--dir-root' con la ruta al directorio de datos."
         )
-        sys.exit(1)  # Salir del programa con un código de error
+        sys.exit(1)
 
     # 1. Indexar el corpus con pyTerrier
     ir = IRSystem(index_path="./wikismall_index")
+    start_time = time.time()
     ir.index_collection(dir_root=dir_root)
+    end_time = time.time()
+    elapsed = end_time - start_time
+    print(f"Indexado completado en {elapsed:.2f} segundos.")
 
     lex = ir.get_index_lexicon()
     for i, kv in enumerate(lex):
