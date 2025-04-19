@@ -31,19 +31,20 @@ def main():
 
     # 1. Indexar el corpus con pyTerrier
     ir = IRSystem(index_path="./wikismall_index")
+    print("Indexando colección...")
     start_time = time.time()
     ir.index_collection(dir_root=dir_root)
     end_time = time.time()
     elapsed = end_time - start_time
     print(f"Indexado completado en {elapsed:.2f} segundos.")
 
-    lex = ir.get_index_lexicon()
-    for i, kv in enumerate(lex):
-        # print("%s -> %s" % (kv.getKey(), kv.getValue().toString()))
-        # print("%s" % (kv.getKey()), end=', ')
-        # print(kv.getFrequency())
-        if i > 100000:
-            break
+    # lex = ir.get_index_lexicon()
+    # for i, kv in enumerate(lex):
+    #     # print("%s -> %s" % (kv.getKey(), kv.getValue().toString()))
+    #     # print("%s" % (kv.getKey()), end=', ')
+    #     # print(kv.getFrequency())
+    #     if i > 100000:
+    #         break
 
     # 2. Ejecutar un experimento de recuperación (y evaluación)
     # 2.1. Definir 5 queries (topics)

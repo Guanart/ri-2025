@@ -28,14 +28,15 @@ class Tokenizador:
         # Compilar patrones
         self.url_pattern = re.compile(
             r"""
-            (?:(?:\b[a-zA-Z][a-zA-Z0-9+\.\-]*://           # Protocolo: http, https o ftp seguido de ://
+            (?:\b[a-zA-Z][a-zA-Z0-9+\.\-]*://           # Protocolo: http, https o ftp seguido de ://
                 (?:[a-zA-Z0-9.-]+\.[A-Za-z]{2,})   # Dominio: al menos un punto y extensión (p.ej., example.com)
                 (?::\d{1,5})?                     # Puerto opcional: : seguido de dígitos
-                (?:\/[^\s?#]*)?               # Path opcional: barra seguida de cualquier caracter excepto espacio, ? o #
-                (?:\?[^\s#]*)?                # Query string opcional: ? seguido de cualquier caracter excepto espacio o #
-                (?:\#[^\s]*)?                # Fragmento opcional: # seguido de cualquier caracter excepto espacio
+                (?:/[^\s?#]*)?                    # Path opcional: barra seguida de cualquier caracter excepto espacio, ? o #
+                (?:\?[^\s#]*)?                    # Query string opcional: ? seguido de cualquier caracter excepto espacio o #
+                (?:\#[^\s]*)?                     # Fragmento opcional: # seguido de cualquier caracter excepto espacio
             )
-            """
+            """,
+            re.VERBOSE
         )
         self.email_pattern = re.compile(
             r"(?:[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,})"
