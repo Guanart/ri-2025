@@ -27,10 +27,10 @@ class IRSystem:
                             text = BeautifulSoup(f, "html.parser").get_text(
                                 separator=" "
                             )  # Concatena el texto de los distintos nodos (tags) HTML con espacios en blanco
+                            """
+                            ACÁ SE PODRÍA HACER UN PARSEO MÁS COMPLEJO DEL HTML (usando BeautifulSoup)
+                            """
                         docno = os.path.relpath(path, root_dir)  # Relativo a root_dir
-                        """
-                        ACÁ SE PODRÍA HACER UN PARSEO MÁS COMPLEJO DEL HTML (usando BeautifulSoup)
-                        """
                         yield {
                             "docno": docno,
                             "text": text,

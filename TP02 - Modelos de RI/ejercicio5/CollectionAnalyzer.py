@@ -36,6 +36,9 @@ class CollectionAnalyzer:
                             text = BeautifulSoup(text, "html.parser").get_text(
                                 separator=" "
                             )
+                            """
+                            ACÁ SE PODRÍA HACER UN PARSEO MÁS COMPLEJO DEL HTML (usando BeautifulSoup)
+                            """
                     tokens = self.tokenizer.tokenizar(text)
                     self.docs_terms[docid] = Counter(tokens)    # Por cada docid, crea un dict que almacena la frecuencia de cada término
         self.N = len(self.docs_terms)   # Complejidad O(1)
