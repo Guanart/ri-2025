@@ -70,7 +70,7 @@ def main():
     results_bm25 = ir.retrieve(topics, model="BM25")
 
     # 3. Resultados
-    print("\n*** Resultados de búsqueda ***")
+    print("\n*** Resultados de búsqueda pyTerrier ***")
     for qid in topics.qid:
         query_text = topics[topics.qid == qid]["query"].values[0]
         print("-----------------------------------------------------------------")

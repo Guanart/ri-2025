@@ -55,25 +55,18 @@ class Tokenizador:
 
     def tokenizar(self, texto: str) -> list:
         """
-        Extrae y normaliza tokens. Después aplica min/max length y stopwords.
+        Tokenización compatible con pyTerrier: solo palabras y números, sin duplicidad.
         """
-        # Extracción
-        tokens = []
-        tokens += self.url_pattern.findall(texto)
-        tokens += self.email_pattern.findall(texto)
-        tokens += self.number_pattern.findall(texto)
-        tokens += self.proper_name_pattern.findall(texto)
-        tokens += self.word_pattern.findall(texto)
-
-        # Normalización: recortar espacios y pasar a minúsculas
-        tokens = [t.strip() for t in tokens if t.strip()]
-        tokens = [t.lower() for t in tokens]
-
+        # Extraer URLs/emails y eliminarlos del texto
+        texto = self.url_pattern.sub(" ", texto)
+        texto = self.email_pattern.sub(" ", texto)
+        # Extraer palabras y números
+        tokens = re.findall(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñçàèìòùâêîôûäëïöü0-9]+", texto)
+        # Normalizar
+        tokens = [t.lower() for t in tokens if t.strip()]
         # Filtrar longitud
         tokens = [t for t in tokens if self.min_len <= len(t) <= self.max_len]
-
         # Filtrar stopwords
         if self.eliminar_stopwords:
             tokens = [t for t in tokens if t not in self.stopwords]
-
         return tokens
