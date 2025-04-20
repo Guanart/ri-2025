@@ -48,5 +48,8 @@ class CollectionAnalyzer:
             self.idf[term] = math.log(self.N / self.df[term])   # por defecto usa logaritmo natural
 
         # Mapear términos a índices de vector
-        for i, term in enumerate(sorted(self.idf.keys())):
-            self.term_index[term] = i
+        for i, term in enumerate(sorted(self.idf.keys())):  # Los ordena alfabéticamente para que la asignación de índices sea determinística (siempre la misma posición para cada término).
+            self.term_index[term] = i   # Guarda el índice numérico que ocupará ese término en los vectores TF–IDF
+            # En el espacio vectorial, cada documento (y cada consulta) se representa con un vector de longitud V (tamaño del vocabulario). Para saber en qué posición del vector colocar el peso de un cada término, necesitamos un mapeo término→índice único.
+
+
