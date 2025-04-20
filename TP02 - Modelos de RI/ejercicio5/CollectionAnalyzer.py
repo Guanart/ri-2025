@@ -52,4 +52,16 @@ class CollectionAnalyzer:
             self.term_index[term] = i   # Guarda el índice numérico que ocupará ese término en los vectores TF–IDF
             # En el espacio vectorial, cada documento (y cada consulta) se representa con un vector de longitud V (tamaño del vocabulario). Para saber en qué posición del vector colocar el peso de un cada término, necesitamos un mapeo término→índice único.
 
+    def total_tokens(self):
+        """
+        Devuelve la cantidad total de tokens en la colección.
+        """
+        return sum(sum(cnt.values()) for cnt in self.docs_terms.values())
+
+    def total_terminos(self):
+        """
+        Devuelve la cantidad de términos únicos en la colección.
+        """
+        return len(self.term_index)
+
 

@@ -67,5 +67,9 @@ def main():
             print(df[["docno", "score", "rank"]])
         print("-----------------------------------------------------------------")
 
+    # Mostrar cantidad de tokens y términos únicos
+    print(f"\nCantidad total de tokens en la colección: {coll.total_tokens()}")
+    print(f"Cantidad de términos únicos en la colección: {coll.total_terminos()}")
+
 if __name__ == '__main__':
     main()
