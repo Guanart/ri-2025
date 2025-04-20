@@ -38,7 +38,14 @@ def main():
     print(f"Indexado completado en {elapsed:.2f} segundos.")
 
     # 3) Recuperar consultas de ejemplo y mostrar resultados
+    print("-----------------------------------------------------------------")
+    print("Generando matriz TF/IDF...")
+    start_time = time.time()
     ir_manual = IRSystemManual(coll)
+    end_time = time.time()
+    elapsed = end_time - start_time
+    print("Matriz TF/IDF generada en {elapsed:.2f} segundos.")
+    print("-----------------------------------------------------------------")
     queries = [
         {"qid": 1, "query": "military base"},
         {"qid": 2, "query": "human circulatory system parts"},
@@ -51,7 +58,7 @@ def main():
         print(f"QID={q['qid']}, Query='{q['query']}'")
     print("-----------------------------------------------------------------")
 
-    print("\n*** Resultados de búsqueda (Sistema Manual) ***")
+    print("\n*** Resultados de búsqueda (Sistema TF/IDF) ***")
     for q in queries:
         print(f"\nConsulta (QID={q['qid']}): '{q['query']}'")
         results = list(ir_manual.query(q['query'], top_k=10))
