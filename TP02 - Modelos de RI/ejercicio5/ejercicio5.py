@@ -47,7 +47,7 @@ def main():
     print("Matriz TF/IDF generada en {elapsed:.2f} segundos.")
     print("-----------------------------------------------------------------")
     queries = [
-        {"qid": 1, "query": "military base"},
+        {"qid": 1, "query": "dog house"},
         {"qid": 2, "query": "human circulatory system parts"},
         {"qid": 3, "query": "Eiffel Tower history"},
         {"qid": 4, "query": "best jazz musicians"},
@@ -77,6 +77,7 @@ def main():
     # Mostrar cantidad de tokens y términos únicos
     print(f"\nCantidad total de tokens en la colección: {coll.total_tokens()}")
     print(f"Cantidad de términos únicos en la colección: {coll.total_terminos()}")
+    print(f"Cantidad de documentos analizados: {coll.N}")
 
 if __name__ == '__main__':
     main()
