@@ -11,17 +11,16 @@ class Tokenizador:
     def __init__(
         self,
         stopwords_path: str = None,
-        eliminar_stopwords: bool = False,
         min_len: int = 1,
         max_len: int = 20,
     ):
         # Configuración
-        self.eliminar_stopwords = eliminar_stopwords
+        self.eliminar_stopwords = stopwords_path is not None
         self.min_len = min_len
         self.max_len = max_len
         # Cargar stopwords si corresponde
         self.stopwords = set()
-        if eliminar_stopwords and stopwords_path:
+        if self.eliminar_stopwords:
             with open(stopwords_path, "r", encoding="utf-8") as f:
                 for line in f:
                     self.stopwords.add(line.strip().lower())

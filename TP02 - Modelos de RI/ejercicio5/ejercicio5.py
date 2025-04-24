@@ -16,9 +16,17 @@ def main():
         required=True,
         help="Directorio raíz que contiene los archivos para la indexación.",
     )
+    parser.add_argument(
+        "--path-stopwords",
+        type=str,
+        required=False,
+        default=None,
+        help="Ruta al archivo de stopwords (opcional).",
+    )
     args = parser.parse_args()
 
     dir_root = args.dir_root
+    path_stopwords = args.path_stopwords
     if not dir_root:
         print(
             "Error: Debes proporcionar el argumento '--dir-root' con la ruta al directorio de datos."
@@ -26,7 +34,7 @@ def main():
         sys.exit(1)
 
     # 1) Preparar tokenizador y analizador
-    tkn = Tokenizador(eliminar_stopwords=True, stopwords_path='stopwords.txt')
+    tkn = Tokenizador(stopwords_path=path_stopwords)
     coll = CollectionAnalyzer(tokenizer=tkn)
 
     # 2) Indexar colección de ejercicios
