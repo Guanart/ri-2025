@@ -7,7 +7,7 @@ from .Tokenizador import Tokenizador
 from typing import Dict, Counter as CounterType
 
 
-class CollectionAnalyzer(CollectionAnalyzerBase):
+class CollectionAnalyzerTFIDF(CollectionAnalyzerBase):
     """
     Indexa una colección de documentos (.txt o .html) en memoria usando la clase Tokenizador.
     Construye:

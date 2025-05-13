@@ -1,5 +1,5 @@
 from .IRSystem import IRSystem
-from .CollectionAnalyzer import CollectionAnalyzer
+from .CollectionAnalyzerTFIDF import CollectionAnalyzerTFIDF
 import numpy as np
 import math
 from collections import Counter
@@ -13,7 +13,7 @@ class IRSystemVectorial(IRSystem):
     doc_vectors: dict[str, np.ndarray]
     doc_norms: dict[str, float]
 
-    def __init__(self, analyzer: CollectionAnalyzer):
+    def __init__(self, analyzer: CollectionAnalyzerTFIDF):
         super().__init__(analyzer)
         self.doc_vectors: dict[str, np.ndarray] = {}
         self.doc_norms: dict[str, float] = {}
