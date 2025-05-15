@@ -31,12 +31,12 @@ class CollectionAnalyzerTFIDF(CollectionAnalyzerBase):
         self.term_index: Dict[str, int] = {}  # término -> índice en vector
         self.N: int = 0  # total de documentos
 
-    def index_collection(self, path: str) -> None:
+    def index_collection(self, docs_path: str) -> None:
         # Recorre recursivamente el directorio
-        for root, _, files in os.walk(path):
+        for root, _, files in os.walk(docs_path):
             for fname in files:
                 if fname.endswith((".html", ".txt")):
-                    docid = os.path.relpath(os.path.join(root, fname), path)
+                    docid = os.path.relpath(os.path.join(root, fname), docs_path)
                     with open(
                         os.path.join(root, fname), encoding="utf8", errors="ignore"
                     ) as f:

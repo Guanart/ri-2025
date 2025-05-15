@@ -13,7 +13,10 @@ class CollectionAnalyzerBase(ABC):
         self.tokenizer = tokenizer
 
     @abstractmethod
-    def index_collection(self, path: str) -> None:
+    def index_collection(self, docs_path: str) -> None:
+        """
+        Indexa la colección de documentos en el directorio docs_path.
+        """
         pass
 
     @abstractmethod

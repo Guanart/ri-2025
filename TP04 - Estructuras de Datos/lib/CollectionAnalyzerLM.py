@@ -24,11 +24,11 @@ class CollectionAnalyzerLM(CollectionAnalyzerBase):
         self.N: int = 0  # cantidad de documentos
         self.collection_len: int = 0  # tokens en la colección
 
-    def index_collection(self, path: str) -> None:
-        for root, _, files in os.walk(path):
+    def index_collection(self, docs_path: str) -> None:
+        for root, _, files in os.walk(docs_path):
             for fname in files:
                 if fname.endswith((".txt", ".html")):
-                    docid = os.path.relpath(os.path.join(root, fname), path)
+                    docid = os.path.relpath(os.path.join(root, fname), docs_path)
                     with open(
                         os.path.join(root, fname), encoding="utf8", errors="ignore"
                     ) as f:

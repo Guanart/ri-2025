@@ -12,17 +12,57 @@ class PostingChunk:
     Métodos:
         next(), reset(), merge_with(), read/write en binario
     """
-    def __init__(self, partial_postings: list[PartialPosting], file_path: Optional[str] = None):
-        self.partial_postings: list[PartialPosting] = partial_postings
-        self.pos: int = 0
-        self.file_path: str = file_path
+    def __init__(self, partial_postings=None, file_path=None):
+        """
+        Si partial_postings es provisto, se usa para escritura (guardar el chunk en disco).
+        Si solo se provee file_path, se usa para lectura secuencial (merge multi-way).
+        """
+        self.file_path = file_path
+        self.partial_postings: Optional[PartialPosting] = partial_postings
+        self.file = None
+        self.current: PartialPosting = None
+        self.eof: bool = False
+        if partial_postings is None and file_path is not None:
+            # Modo lectura secuencial
+            self.file = open(file_path, 'rb')
+            self._read_next()
+        # Si partial_postings está definido, se usará write_to_disk para guardar
 
-    def next(self) -> Optional[PartialPosting]:
-        if self.pos < len(self.partial_postings):
-            p = self.partial_postings[self.pos]
-            self.pos += 1
-            return p
-        return None
+    def _read_next(self):
+        """
+        Lee el siguiente PartialPosting del archivo y lo guarda en self.current.
+        Si llega al final, marca self.eof = True.
+        """
+        data = self.file.read(12)  # 3 enteros de 4 bytes: term_id, doc_id, freq
+        if data and len(data) == 12:
+            term_id, doc_id, freq = struct.unpack('III', data)
+            self.current = PartialPosting(term_id, doc_id, freq)
+        else:
+            self.current = None
+            self.eof = True
+
+    def next(self):
+        """
+        Avanza al siguiente PartialPosting. Si no hay más, self.eof = True.
+        """
+        if not self.eof:
+            self._read_next()
+
+    def has_next(self) -> bool:
+        """
+        Devuelve True si hay un PartialPosting actual, False si terminó el archivo.
+        """
+        return not self.eof
+
+    def get_current(self) -> Optional[PartialPosting]:
+        """
+        Devuelve el PartialPosting actual (o None si terminó).
+        """
+        return self.current
+
+    def close(self):
+        if self.file:
+            self.file.close()
 
     def reset(self) -> None:
         self.pos = 0
@@ -34,6 +74,8 @@ class PostingChunk:
         """
         if not self.file_path:
             raise ValueError("file_path no especificado para PostingChunk.")
+        if self.partial_postings is None:
+            raise ValueError("No hay postings en memoria para escribir.")
         with open(self.file_path, 'wb') as f:
             for posting in self.partial_postings:
                 f.write(posting.to_bytes())
