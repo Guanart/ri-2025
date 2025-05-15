@@ -1,4 +1,4 @@
-from IndexadorBSBI import IndexadorBSBI
+from .IndexadorBSBI import IndexadorBSBI
 from lib.IRSystem import IRSystem
 from lib.Posting import Posting
 import os

@@ -1,5 +1,5 @@
 from typing import Optional
-from PartialPosting import PartialPosting
+from .PartialPosting import PartialPosting
 import struct
 
 class PostingChunk:

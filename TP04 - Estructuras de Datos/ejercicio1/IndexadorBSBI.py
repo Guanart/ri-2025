@@ -181,3 +181,18 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         if not self.vocabulario:
             self._load_vocabulary()
         return self.vocabulario
+    
+
+
+
+
+
+
+    # ESTO LO PUSE POR LA ABSTRACT CLASS
+
+    def total_tokens(self) -> int:
+        # No llevas la cuenta exacta, así que devolvemos 0 o podrías sumar frecuencias si lo implementas
+        return 0
+
+    def total_terminos(self) -> int:
+        return len(self.term2id)
