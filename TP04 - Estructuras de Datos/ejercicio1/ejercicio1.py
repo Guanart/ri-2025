@@ -4,6 +4,7 @@ from .IndexadorBSBI import IndexadorBSBI
 from lib.Tokenizador import Tokenizador
 from lib.Posting import Posting
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Recupera la posting list de un término desde el índice en disco usando IRSystemBSBI."
@@ -15,7 +16,9 @@ def main():
         required=True,
         help="Directorio raíz que contiene los archivos para la indexación.",
     )
-    parser.add_argument("--termino", type=str, required=True, help="Término a buscar en el vocabulario")
+    parser.add_argument(
+        "--termino", type=str, required=True, help="Término a buscar en el vocabulario"
+    )
     args = parser.parse_args()
 
     # Instanciar el sistema de recuperación
@@ -30,7 +33,10 @@ def main():
         return
     print("Postings para el término '{}':".format(args.termino))
     for posting in posting_list:
-        print(f"Documento: {posting.doc_name}, ID: {posting.doc_id}, Frecuencia: {posting.freq}")
+        print(
+            f"Documento: {posting.doc_name}, ID: {posting.doc_id}, Frecuencia: {posting.freq}"
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

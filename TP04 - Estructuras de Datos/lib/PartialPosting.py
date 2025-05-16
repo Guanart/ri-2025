@@ -1,5 +1,6 @@
 import struct
 
+
 class PartialPosting:
     """
     Clase que representa un posting parcial, usado durante el proceso de indexación.
@@ -8,7 +9,8 @@ class PartialPosting:
         doc_id: int - ID del documento
         freq: int - frecuencia del término en el documento
     """
-    STRUCT_FORMAT = 'III'  # 3 unsigned ints
+
+    STRUCT_FORMAT = "III"  # 3 unsigned ints
     SIZE = 4 * 3  # 3 enteros de 4 bytes
 
     def __init__(self, term_id: int, doc_id: int, freq: int):
@@ -23,9 +25,12 @@ class PartialPosting:
         return struct.pack(self.STRUCT_FORMAT, self.term_id, self.doc_id, self.freq)
 
     @staticmethod
-    def from_bytes(data: bytes) -> 'PartialPosting':
-        term_id, doc_id, freq = struct.unpack(PartialPosting.STRUCT_FORMAT, data[:PartialPosting.SIZE])
+    def from_bytes(data: bytes) -> "PartialPosting":
+        term_id, doc_id, freq = struct.unpack(
+            PartialPosting.STRUCT_FORMAT, data[: PartialPosting.SIZE]
+        )
         return PartialPosting(term_id, doc_id, freq)
+
 
 # Alternativa con tuplas (más eficiente que una clase):
 # from collections import namedtuple

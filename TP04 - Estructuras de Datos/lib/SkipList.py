@@ -1,5 +1,6 @@
 from typing import Optional
 
+
 class SkipList:
     """
     Permite saltar posiciones en una posting list para acelerar operaciones AND.
@@ -8,12 +9,14 @@ class SkipList:
     Métodos:
         skip_to(doc_id)
     """
+
     def __init__(self, skips: list[int]):
         self.skips = skips
 
     def skip_to(self, doc_id: int) -> int:
         # Devuelve el índice del posting >= doc_id usando los skips
         pass
+
 
 class Vocabulario:
     """
@@ -26,6 +29,7 @@ class Vocabulario:
     Métodos:
         to_bytes(), from_bytes(), serialización con pickle
     """
+
     def __init__(self, term: str, df: int, seek: int, term_id: Optional[int] = None):
         self.term = term
         self.df = df
@@ -37,6 +41,6 @@ class Vocabulario:
         pass
 
     @staticmethod
-    def from_bytes(data: bytes) -> 'Vocabulario':
+    def from_bytes(data: bytes) -> "Vocabulario":
         # Deserializa desde binario
         pass

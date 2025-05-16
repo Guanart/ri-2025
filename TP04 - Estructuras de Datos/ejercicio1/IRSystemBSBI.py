@@ -3,11 +3,13 @@ from lib.IRSystem import IRSystem
 from lib.Posting import Posting
 import os
 
+
 class IRSystemBSBI(IRSystem):
     """
     Sistema de recuperación para índice BSBI persistido en disco.
     Permite cargar el vocabulario y recuperar posting lists de manera sencilla.
     """
+
     def __init__(self, analyzer: IndexadorBSBI):
         super().__init__(analyzer)
         self.index_dir = analyzer.path_index

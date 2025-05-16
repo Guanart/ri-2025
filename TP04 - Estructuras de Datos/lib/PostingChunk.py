@@ -2,6 +2,7 @@ from typing import Optional
 from .PartialPosting import PartialPosting
 import struct
 
+
 class PostingChunk:
     """
     Maneja un bloque (chunk) de postings parciales en disco.
@@ -12,6 +13,7 @@ class PostingChunk:
     Métodos:
         next(), reset(), merge_with(), read/write en binario
     """
+
     def __init__(self, partial_postings=None, file_path=None):
         """
         Si partial_postings es provisto, se usa para escritura (guardar el chunk en disco).
@@ -24,7 +26,7 @@ class PostingChunk:
         self.eof: bool = False
         if partial_postings is None and file_path is not None:
             # Modo lectura secuencial
-            self.file = open(file_path, 'rb')
+            self.file = open(file_path, "rb")
             self._read_next()
         # Si partial_postings está definido, se usará write_to_disk para guardar
 
@@ -75,15 +77,15 @@ class PostingChunk:
             raise ValueError("file_path no especificado para PostingChunk.")
         if self.partial_postings is None:
             raise ValueError("No hay postings en memoria para escribir.")
-        with open(self.file_path, 'wb') as f:
+        with open(self.file_path, "wb") as f:
             for posting in self.partial_postings:
                 f.write(posting.to_bytes())
 
     @staticmethod
-    def read_from_disk(file_path: str) -> 'PostingChunk':
+    def read_from_disk(file_path: str) -> "PostingChunk":
         # Lee un chunk desde disco y devuelve un PostingChunk
         pass
 
-    def merge_with(self, other: 'PostingChunk') -> 'PostingChunk':
+    def merge_with(self, other: "PostingChunk") -> "PostingChunk":
         # Devuelve un nuevo PostingChunk con la fusión ordenada de self y other
         pass
