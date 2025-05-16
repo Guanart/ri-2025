@@ -1,6 +1,8 @@
 # history
 .history
 datos
+*.bin
+*.pkl
 
 custom_env
 

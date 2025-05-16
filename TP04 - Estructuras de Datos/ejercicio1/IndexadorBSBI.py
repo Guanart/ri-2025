@@ -39,15 +39,6 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         self.term2id: Dict[str, int] = {}
         self.id2term: Dict[int, str] = {}
         self.doc_id_map: Dict[int, str] = {}  # doc_id -> nombre del archivo
-        # self.postings_tmp = {}  # postings temporales en memoria (opcional)
-
-        # En algún lugar tengo que definir el tamaño de los postings (en bytes), que contendrá: nombre del archivo, DOCID y frecuencia del término, en principio. La frecuencia del término es un entero (es importante para poder rankear), el DOCID es un entero y el nombre del archivo es una cadena de caracteres.
-        #
-        # La estructura de cada Posting es: DocName:docID:Frecuencia.
-        # Usaremos UTF-8 con caracteres ASCII para el DocName, asi ocupan 1 byte por caracter.
-        # Las consultas AND, OR y NOT se hacen entre listas de postings -> AND es intersección y OR es unión.
-
-        # 1.1) Podría hacer una clase Vocabulario (o simplemente usar Pickle y persistir el diccionario)
 
     def index_collection(self, docs_path: str) -> None:
         """
@@ -132,13 +123,15 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         Utiliza PostingChunk en modo lectura secuencial para cada chunk.
         """
         chunk_objs = [PostingChunk(file_path=chunk_path) for chunk_path in self.chunks]
-        heap: list[tuple[int, PartialPosting]] = []
+        heap: list[tuple[int, int, int, PartialPosting]] = (
+            []
+        )  # (term_id, doc_id, chunk_id, PartialPosting)
 
         # Leer el primer registro de cada chunk y agregarlo al heap
         for chunk_id, chunk in enumerate(chunk_objs):
             if chunk.get_current() is not None:
                 pp = chunk.get_current()
-                heapq.heappush(heap, (chunk_id, pp))
+                heapq.heappush(heap, (pp.term_id, pp.doc_id, chunk_id, pp))
 
         # Abrir archivo final de postings en modo escritura binaria y crear el índice final
         with open(self.path_index + "/final_index.bin", "wb") as final_index_file:
@@ -147,12 +140,12 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             current_posting_list: list[Posting] = []
 
             while heap:
-                chunk_id, pp = heapq.heappop(heap)
+                term_id, doc_id, chunk_id, pp = heapq.heappop(heap)
                 if current_term_id is None:  # solo para la primera iteración
-                    current_term_id = pp.term_id
+                    current_term_id = term_id
 
                 # Si el término actual es diferente al anterior, escribir la posting list actual (porque ya está completa) y agregar el término al vocabulario
-                if pp.term_id != current_term_id:
+                if term_id != current_term_id:
                     for posting in current_posting_list:
                         final_index_file.write(posting.to_bytes())
                     # Guardar en vocabulario: offset y df
@@ -162,7 +155,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                     }
                     offset += 8 * len(current_posting_list)
                     # Reset
-                    current_term_id = pp.term_id
+                    current_term_id = term_id
                     current_posting_list = []
 
                 current_posting_list.append(Posting(pp.doc_id, pp.freq))
@@ -172,8 +165,9 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                 chunk.next()
                 if chunk.get_current() is not None:
                     next_pp = chunk.get_current()
-                    # Si el chunk tiene más postings, agregar al heap para seguir procesandolo
-                    heapq.heappush(heap, (chunk_id, next_pp))
+                    heapq.heappush(
+                        heap, (next_pp.term_id, next_pp.doc_id, chunk_id, next_pp)
+                    )
             # END WHILE
 
             # Escribir la última posting list

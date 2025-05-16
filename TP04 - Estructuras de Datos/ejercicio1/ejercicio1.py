@@ -1,23 +1,28 @@
 import argparse
-from .IRSystemBSBI import IRSystemBSBI
-from .IndexadorBSBI import IndexadorBSBI
+import sys
+import os
+from ejercicio1.IRSystemBSBI import IRSystemBSBI
+from ejercicio1.IndexadorBSBI import IndexadorBSBI
 from lib.Tokenizador import Tokenizador
 from lib.Posting import Posting
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Recupera la posting list de un término desde el índice en disco usando IRSystemBSBI."
+        description="Carga el vocabulario y recupera la posting list de un término desde el índice en disco usando IRSystemBSBI. Se muestra con el formato 'doc_name:doc_id:freq'."
     )
-    # parser.add_argument("--index-dir", type=str, required=True, help="Directorio donde está el índice (vocabulario y postings.bin)")
+    # parser.add_argument("--index-dir", type=str, required=True, help="Directorio donde está el índice (vocabulario y postings)")
     parser.add_argument(
         "--corpus-path",
         type=str,
         required=True,
-        help="Directorio raíz que contiene los archivos para la indexación.",
+        help="Directorio raíz que contiene los documentos a indexar.",
     )
     parser.add_argument(
-        "--termino", type=str, required=True, help="Término a buscar en el vocabulario"
+        "--termino",
+        type=str,
+        required=True,
+        help="Término a buscar en el vocabulario",
     )
     args = parser.parse_args()
 
@@ -31,11 +36,9 @@ def main():
     if not posting_list:
         print(f"El término '{args.termino}' no está en el vocabulario.")
         return
-    print("Postings para el término '{}':".format(args.termino))
+    print(f"Postings para el término '{args.termino}':")
     for posting in posting_list:
-        print(
-            f"Documento: {posting.doc_name}, ID: {posting.doc_id}, Frecuencia: {posting.freq}"
-        )
+        print(f"{posting.doc_name}:{posting.doc_id}:{posting.freq}")
 
 
 if __name__ == "__main__":
