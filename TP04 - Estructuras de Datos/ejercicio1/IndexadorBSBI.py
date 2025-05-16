@@ -13,6 +13,14 @@ from lib.PostingChunk import PostingChunk
 from lib.Posting import Posting
 
 class IndexadorBSBI(CollectionAnalyzerBase):
+    # Constantes de archivos y tamaños
+    VOCABULARY_FILENAME = "vocabulary.pkl"
+    POSTINGS_FILENAME = "final_index.bin"
+    DOCID_SIZE = 4  # bytes
+    FREQ_SIZE = 4   # bytes
+    POSTING_STRUCT_FORMAT = 'II'  # 2 unsigned ints
+    POSTING_SIZE = DOCID_SIZE + FREQ_SIZE  # 8 bytes
+
     def __init__(self, tokenizer: Tokenizador, memory_limit: int = 1000, path_index: str = "index"):
         super().__init__(tokenizer)
         self.memory_limit: int = memory_limit
@@ -37,9 +45,11 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         Indexa la colección usando BSBI. Procesa bloques de n documentos, vuelca a disco y mergea los chunks.
         """
-        # Recorre recursivamente el directorio
+        os.makedirs(self.path_index, exist_ok=True)
         doc_id: int = 0
         current_chunk_postings: list  = []
+        
+        # Recorre recursivamente el directorio
         for root, _, files in os.walk(docs_path):
             for fname in files:
                 # Validar memoria. Si se supera el límite, procesar el chunk actual y reiniciar
@@ -48,11 +58,12 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                     current_chunk_postings = []
                     self.memory_usage = 0
 
+                # ParseNextBlock() de la diapositiva
                 if fname.endswith((".html", ".txt")):
-                    # ParseNextBlock() de la diapositiva
-                    tokens, doc_name = self._process_doc(fname, root, docs_path)
                     self.memory_usage += 1
                     doc_id += 1
+                    print(f"\rProcesando documento {doc_id}: {fname}", end='', flush=True)
+                    tokens, doc_name = self._process_doc(fname, root, docs_path)
                     terms_freq = Counter(tokens)
                     for token, freq in terms_freq.items():
                         if token not in self.term2id:
@@ -63,7 +74,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                     self.doc_id_map[doc_id] = doc_name
         
         # Procesar el último chunk
-        if current_chunk_postings.count() > 0:
+        if len(current_chunk_postings) > 0:
             self._process_chunk(current_chunk_postings)
             current_chunk_postings = []
 
@@ -144,7 +155,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                 if chunk.get_current() is not None:
                     next_pp = chunk.get_current()
                     # Si el chunk tiene más postings, agregar al heap para seguir procesandolo
-                    heapq.heappush(heap, (next_pp.term_id, next_pp.doc_id, chunk_id, next_pp))
+                    heapq.heappush(heap, (chunk_id, next_pp))
             # END WHILE
 
             # Escribir la última posting list
@@ -164,7 +175,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         vocab_path = os.path.join(self.path_index, "vocabulary.pkl")
         with open(vocab_path, "wb") as f:
-            pickle.dump(self.vocabulario, f)
+            pickle.dump(self.vocabulary, f)
 
     def _load_vocabulary(self) -> None:
         """
@@ -172,15 +183,15 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         vocab_path = os.path.join(self.path_index, "vocabulary.pkl")
         with open(vocab_path, "rb") as f:
-            self.vocabulario = pickle.load(f)
+            self.vocabulary = pickle.load(f)
 
     def get_vocabulary(self) -> Dict[str, Dict[str, int]]:
         """
         Devuelve el vocabulario cargado en memoria.
         """
-        if not self.vocabulario:
+        if not self.vocabulary:
             self._load_vocabulary()
-        return self.vocabulario
+        return self.vocabulary
     
 
 

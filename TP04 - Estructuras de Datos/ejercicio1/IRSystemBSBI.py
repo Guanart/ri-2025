@@ -2,7 +2,6 @@ from .IndexadorBSBI import IndexadorBSBI
 from lib.IRSystem import IRSystem
 from lib.Posting import Posting
 import os
-import pickle
 
 class IRSystemBSBI(IRSystem):
     """
@@ -11,6 +10,9 @@ class IRSystemBSBI(IRSystem):
     """
     def __init__(self, analyzer: IndexadorBSBI):
         super().__init__(analyzer)
+        self.index_dir = analyzer.path_index
+        # Setear el doc_id_map global en Posting para que cada Posting pueda resolver su doc_name
+        Posting.set_doc_id_map(analyzer.doc_id_map)
 
     def index_collection(self, path: str) -> None:
         self.analyzer.index_collection(path)
@@ -23,18 +25,16 @@ class IRSystemBSBI(IRSystem):
         Devuelve la posting list de un término como lista de objetos Posting.
         """
         vocabulary = self.analyzer.get_vocabulary()
-        postings_path = os.path.join(self.index_dir, "final_index.bin")
-        
+        postings_path = os.path.join(self.index_dir, self.analyzer.POSTINGS_FILENAME)
+        posting_size = self.analyzer.POSTING_SIZE
         if termino not in vocabulary:
             return []
-        
         puntero, df = vocabulary[termino]["puntero"], vocabulary[termino]["df"]
-        
         resultado = []
         with open(postings_path, "rb") as f:
             f.seek(puntero)
             for _ in range(df):
-                data = f.read(8)
+                data = f.read(posting_size)
                 posting = Posting.from_bytes(data)
                 resultado.append(posting)
         return resultado

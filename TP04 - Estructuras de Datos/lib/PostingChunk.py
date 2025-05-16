@@ -33,10 +33,9 @@ class PostingChunk:
         Lee el siguiente PartialPosting del archivo y lo guarda en self.current.
         Si llega al final, marca self.eof = True.
         """
-        data = self.file.read(12)  # 3 enteros de 4 bytes: term_id, doc_id, freq
-        if data and len(data) == 12:
-            term_id, doc_id, freq = struct.unpack('III', data)
-            self.current = PartialPosting(term_id, doc_id, freq)
+        data = self.file.read(PartialPosting.SIZE)
+        if data and len(data) == PartialPosting.SIZE:
+            self.current = PartialPosting.from_bytes(data)
         else:
             self.current = None
             self.eof = True
