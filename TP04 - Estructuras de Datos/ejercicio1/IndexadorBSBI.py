@@ -2,7 +2,7 @@ from collections import Counter
 import os
 import pickle
 import heapq
-import struct
+import time
 from bs4 import BeautifulSoup
 from typing import Dict
 
@@ -43,10 +43,14 @@ class IndexadorBSBI(CollectionAnalyzerBase):
     def index_collection(self, docs_path: str) -> None:
         """
         Indexa la colección usando BSBI. Procesa bloques de n documentos, vuelca a disco y mergea los chunks.
+        Mide y reporta los tiempos de indexado y merge por separado.
         """
         os.makedirs(self.path_index, exist_ok=True)
         doc_id: int = 0
         current_chunk_postings: list = []
+
+        print("Iniciando indexado (BSBI)...")
+        t_index_start = time.time()
 
         # Recorre recursivamente el directorio
         for root, _, files in os.walk(docs_path):
@@ -83,7 +87,15 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             self._process_chunk(current_chunk_postings)
             current_chunk_postings = []
 
+        t_index_end = time.time()
+        print(f"\nTiempo de indexado (volcado parcial): {t_index_end - t_index_start:.2f} segundos")
+
+        print("Iniciando merge de chunks...")
+        t_merge_start = time.time()
         self._merge_chunks()
+        t_merge_end = time.time()
+        print(f"Tiempo de merge: {t_merge_end - t_merge_start:.2f} segundos")
+
         self._write_vocabulary()
 
     def _process_doc(self, fname: str, root: str, path: str) -> str:
@@ -207,6 +219,27 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         if not self.vocabulary:
             self._load_vocabulary()
         return self.vocabulary
+
+    def index_size_on_disk(self) -> dict:
+        """
+        Devuelve el tamaño en bytes del índice en disco (postings y vocabulario).
+        """
+        postings_path = os.path.join(self.path_index, self.POSTINGS_FILENAME)
+        vocab_path = os.path.join(self.path_index, self.VOCABULARY_FILENAME)
+        size_postings = os.path.getsize(postings_path) if os.path.exists(postings_path) else 0
+        size_vocab = os.path.getsize(vocab_path) if os.path.exists(vocab_path) else 0
+        return {
+            "size_postings": size_postings,
+            "size_vocab": size_vocab,
+        }
+
+    def posting_list_sizes(self) -> list:
+        """
+        Devuelve una lista con los tamaños (df) de todas las posting lists del vocabulario.
+        """
+        if not self.vocabulary:
+            self._load_vocabulary()
+        return [v["df"] for v in self.vocabulary.values()]
 
     # ESTO LO PUSE POR LA ABSTRACT CLASS
 
