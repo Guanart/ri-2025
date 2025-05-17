@@ -1,5 +1,5 @@
 import re
-from typing import List, Set
+from typing import Optional
 
 
 class Tokenizador:
@@ -12,18 +12,18 @@ class Tokenizador:
     eliminar_stopwords: bool
     min_len: int
     max_len: int
-    stopwords: Set[str]
-    url_pattern: re.Pattern
-    email_pattern: re.Pattern
-    acronym_pattern: re.Pattern
-    abreviations_pattern: re.Pattern
-    number_pattern: re.Pattern
-    proper_name_pattern: re.Pattern
-    word_pattern: re.Pattern
+    stopwords: set[str]
+    url_pattern: re.Pattern[str]
+    email_pattern: re.Pattern[str]
+    acronym_pattern: re.Pattern[str]
+    abreviations_pattern: re.Pattern[str]
+    number_pattern: re.Pattern[str]
+    proper_name_pattern: re.Pattern[str]
+    word_pattern: re.Pattern[str]
 
     def __init__(
         self,
-        stopwords_path: str = None,
+        stopwords_path: Optional[str] = None,
         min_len: int = 1,
         max_len: int = 20,
     ):
@@ -32,8 +32,8 @@ class Tokenizador:
         self.min_len = min_len
         self.max_len = max_len
         # Cargar stopwords si corresponde
-        self.stopwords = set()
-        if self.eliminar_stopwords:
+        self.stopwords: set[str] = set()
+        if self.eliminar_stopwords and stopwords_path is not None:
             with open(stopwords_path, "r", encoding="utf-8") as f:
                 for line in f:
                     self.stopwords.add(line.strip().lower())
@@ -67,7 +67,7 @@ class Tokenizador:
         )  # Nombres propios compuestos (al menos dos palabras con mayúscula inicial) como "Domingo Faustino Sarmiento"
         self.word_pattern = re.compile(r"(?:[A-Za-zÁÉÍÓÚÜÑáéíóúüñçàèìòùâêîôûäëïöü]+)")
 
-    def tokenizar(self, texto: str) -> List[str]:
+    def tokenizar(self, texto: str) -> list[str]:
         """
         Tokenización compatible con pyTerrier: solo palabras y números, sin duplicidad.
         """
@@ -75,7 +75,7 @@ class Tokenizador:
         texto = self.url_pattern.sub(" ", texto)
         texto = self.email_pattern.sub(" ", texto)
         # Extraer palabras y números
-        tokens = re.findall(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñçàèìòùâêîôûäëïöü0-9]+", texto)
+        tokens: list[str] = re.findall(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñçàèìòùâêîôûäëïöü0-9]+", texto)
         # Normalizar
         tokens = [t.lower() for t in tokens if t.strip()]
         # Filtrar longitud

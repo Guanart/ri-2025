@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Any
 from .CollectionAnalyzerBase import CollectionAnalyzerBase
 
 
@@ -21,5 +20,5 @@ class IRSystem(ABC):
         pass
 
     @abstractmethod
-    def query(self, text: str, **kwargs):
+    def query(self, text: str, **kwargs: object):
         pass

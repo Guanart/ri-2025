@@ -1,6 +1,6 @@
 from typing import Optional
+
 from .PartialPosting import PartialPosting
-import struct
 
 
 class PostingChunk:
@@ -14,15 +14,14 @@ class PostingChunk:
         next(), reset(), merge_with(), read/write en binario
     """
 
-    def __init__(self, partial_postings=None, file_path=None):
+    def __init__(self, partial_postings: Optional[list[PartialPosting]] = None, file_path: Optional[str] = None):
         """
         Si partial_postings es provisto, se usa para escritura (guardar el chunk en disco).
         Si solo se provee file_path, se usa para lectura secuencial (merge multi-way).
         """
-        self.file_path = file_path
-        self.partial_postings: Optional[PartialPosting] = partial_postings
-        self.file = None
-        self.current: PartialPosting = None
+        self.file_path: Optional[str] = file_path
+        self.partial_postings: Optional[list[PartialPosting]] = partial_postings
+        self.current: Optional[PartialPosting] = None
         self.eof: bool = False
         if partial_postings is None and file_path is not None:
             # Modo lectura secuencial
@@ -66,7 +65,7 @@ class PostingChunk:
             self.file.close()
 
     def reset(self) -> None:
-        self.pos = 0
+        self.pos: int = 0
 
     def write_to_disk(self) -> None:
         """
@@ -80,12 +79,3 @@ class PostingChunk:
         with open(self.file_path, "wb") as f:
             for posting in self.partial_postings:
                 f.write(posting.to_bytes())
-
-    @staticmethod
-    def read_from_disk(file_path: str) -> "PostingChunk":
-        # Lee un chunk desde disco y devuelve un PostingChunk
-        pass
-
-    def merge_with(self, other: "PostingChunk") -> "PostingChunk":
-        # Devuelve un nuevo PostingChunk con la fusión ordenada de self y other
-        pass

@@ -1,10 +1,8 @@
 import argparse
-import sys
-import os
-from ejercicio1.IRSystemBSBI import IRSystemBSBI
-from ejercicio1.IndexadorBSBI import IndexadorBSBI
 from lib.Tokenizador import Tokenizador
 from lib.Posting import Posting
+from lib.IRSystemBSBI import IRSystemBSBI
+from lib.IndexadorBSBI import IndexadorBSBI
 
 
 def main():

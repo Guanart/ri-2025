@@ -47,7 +47,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         os.makedirs(self.path_index, exist_ok=True)
         doc_id: int = 0
-        current_chunk_postings: list = []
+        current_chunk_postings: list[PartialPosting] = []
 
         print("Iniciando indexado (BSBI)...")
         t_index_start = time.time()
@@ -98,7 +98,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
 
         self._write_vocabulary()
 
-    def _process_doc(self, fname: str, root: str, path: str) -> str:
+    def _process_doc(self, fname: str, root: str, path: str) -> tuple[list[str], str]:
         with open(os.path.join(root, fname), encoding="utf8", errors="ignore") as f:
             text = f.read()
             if fname.endswith(".html"):
@@ -110,7 +110,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         doc_name = os.path.relpath(os.path.join(root, fname), path)
         return tokens, doc_name
 
-    def _process_chunk(self, chunk: list[PartialPosting]) -> str:
+    def _process_chunk(self, chunk: list[PartialPosting]) -> None:
         """
         Procesa un bloque (chunk) de documentos, construye el índice parcial y lo vuelca a disco.
         Devuelve el path al archivo de chunk generado.
@@ -141,8 +141,8 @@ class IndexadorBSBI(CollectionAnalyzerBase):
 
         # Leer el primer registro de cada chunk y agregarlo al heap
         for chunk_id, chunk in enumerate(chunk_objs):
-            if chunk.get_current() is not None:
-                pp = chunk.get_current()
+            pp = chunk.get_current()
+            if pp is not None:
                 heapq.heappush(heap, (pp.term_id, pp.doc_id, chunk_id, pp))
 
         # Abrir archivo final de postings en modo escritura binaria y crear el índice final
@@ -152,7 +152,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             current_posting_list: list[Posting] = []
 
             while heap:
-                term_id, doc_id, chunk_id, pp = heapq.heappop(heap)
+                term_id, _, chunk_id, pp = heapq.heappop(heap)
                 if current_term_id is None:  # solo para la primera iteración
                     current_term_id = term_id
 
@@ -175,26 +175,24 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                 # Avanzar en el chunk correspondiente (extraido de la cabeza del heap)
                 chunk = chunk_objs[chunk_id]
                 chunk.next()
-                if chunk.get_current() is not None:
-                    next_pp = chunk.get_current()
+                next_pp = chunk.get_current()
+                if next_pp is not None:
                     heapq.heappush(
                         heap, (next_pp.term_id, next_pp.doc_id, chunk_id, next_pp)
                     )
-            # END WHILE
-
-            # Escribir la última posting list
-            if current_posting_list:
-                for posting in current_posting_list:
-                    final_index_file.write(posting.to_bytes())
-                self.vocabulary[self.id2term[current_term_id]] = {
-                    "puntero": offset,
-                    "df": len(current_posting_list),
-                }
+            else:   # END WHILE
+                # Escribir la última posting list
+                if current_posting_list and current_term_id is not None:
+                    for posting in current_posting_list:
+                        final_index_file.write(posting.to_bytes())
+                    self.vocabulary[self.id2term[current_term_id]] = {
+                        "puntero": offset,
+                        "df": len(current_posting_list),
+                    }
 
         # Cerrar todos los chunks
         for chunk in chunk_objs:
             chunk.close()
-        self._write_vocabulary()
 
     def _write_vocabulary(self) -> None:
         """
@@ -220,7 +218,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             self._load_vocabulary()
         return self.vocabulary
 
-    def index_size_on_disk(self) -> dict:
+    def index_size_on_disk(self) -> Dict[str, int]:
         """
         Devuelve el tamaño en bytes del índice en disco (postings y vocabulario).
         """
@@ -233,7 +231,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             "size_vocab": size_vocab,
         }
 
-    def posting_list_sizes(self) -> list:
+    def posting_list_sizes(self) -> list[int]:
         """
         Devuelve una lista con los tamaños (df) de todas las posting lists del vocabulario.
         """
