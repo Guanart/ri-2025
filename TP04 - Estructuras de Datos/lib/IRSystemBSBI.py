@@ -28,6 +28,9 @@ class IRSystemBSBI(IRSystem):
         pass
 
     def taat_query(self, query: str) -> list[tuple[int, str]]:
+        """
+        Evalúa una consulta booleana TAAT (Term At A Time) y devuelve los documentos que la satisfacen.
+        """
         algebra: boolean.BooleanAlgebra = boolean.BooleanAlgebra()
         expr = algebra.parse(query.lower())
         print(f"Expresión booleana: {expr}")
