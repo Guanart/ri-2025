@@ -28,11 +28,11 @@ def main():
     patterns_2 = [
         "{0} AND {1}",
         "{0} OR {1}",
-        "{0} NOT {1}",
+        "{0} AND NOT {1}",  # <-- corregido: no reconocia los queries sin el AND antes del NOT
     ]
     patterns_3 = [
         "{0} AND {1} AND {2}",
-        "({0} OR {1}) NOT {2}",
+        "({0} OR {1}) AND NOT {2}",  # <-- corregido
         "({0} AND {1}) OR {2}",
     ]
 
