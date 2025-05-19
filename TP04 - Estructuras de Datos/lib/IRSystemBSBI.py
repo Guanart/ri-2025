@@ -33,14 +33,12 @@ class IRSystemBSBI(IRSystem):
         """
         algebra: boolean.BooleanAlgebra = boolean.BooleanAlgebra()
         expr = algebra.parse(query.lower())
-        print(f"Expresión booleana: {expr}")
 
         def get_docid_set(term: str) -> set[int]:
             postings = self.get_term_from_posting_list(term)
             return set(p.doc_id for p in postings)
 
         def eval_expr(e) -> set[int]:
-            print(f"Evaluando expresión: {e}")
             if e.isliteral:
                 return get_docid_set(str(e))
             op = getattr(e, "operator", None)
