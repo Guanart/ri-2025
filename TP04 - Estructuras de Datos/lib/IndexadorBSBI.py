@@ -97,6 +97,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         print(f"Tiempo de merge: {t_merge_end - t_merge_start:.2f} segundos")
 
         self._write_vocabulary()
+        self._write_metadata()
 
     def _process_doc(self, fname: str, root: str, path: str) -> tuple[list[str], str]:
         with open(os.path.join(root, fname), encoding="utf8", errors="ignore") as f:
@@ -238,6 +239,31 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         if not self.vocabulary:
             self._load_vocabulary()
         return [v["df"] for v in self.vocabulary.values()]
+
+    def _write_metadata(self) -> None:
+        """
+        Persiste el doc_id_map en disco.
+        """
+        metadata_path = os.path.join(self.path_index, "metadata.pkl")
+        with open(metadata_path, "wb") as f:
+            pickle.dump(self.doc_id_map, f)
+
+    def _load_metadata(self) -> None:
+        """
+        Carga el doc_id_map desde disco a memoria.
+        """
+        metadata_path = os.path.join(self.path_index, "metadata.pkl")
+        if os.path.exists(metadata_path):
+            with open(metadata_path, "rb") as f:
+                self.doc_id_map = pickle.load(f)
+
+    def get_doc_id_map(self) -> dict[int, str]:
+        """
+        Devuelve el doc_id_map cargado en memoria.
+        """
+        if not self.doc_id_map:
+            self._load_metadata()
+        return self.doc_id_map
 
     # ESTO LO PUSE POR LA ABSTRACT CLASS
 
