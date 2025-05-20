@@ -18,6 +18,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
     VOCABULARY_FILENAME = "vocabulary.pkl"
     POSTINGS_FILENAME = "final_index.bin"
     METADATA_FILENAME = "metadata.pkl"
+    SKIPS_FILENAME = "skips.pkl"
     DOCID_SIZE = 4  # bytes
     FREQ_SIZE = 4  # bytes
     POSTING_STRUCT_FORMAT = "II"  # 2 unsigned ints
@@ -131,70 +132,88 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         chunk_obj.write_to_disk()  # WriteBlockToDisk(block) de la diapositiva
         self.chunks.append(chunk_file_path)
 
+    def _process_skip_list(self, posting_list, posting_offsets):
+        """
+        Dada una posting list y sus offsets, calcula la skip list [(docid, offset_byte), ...].
+        """
+        df = len(posting_list)
+        if df == 0:
+            return []
+        k = int(df ** 0.5)
+        if k == 0:
+            return []
+        skips = []
+        for skip_idx in range(0, df, k):
+            docid = posting_list[skip_idx].doc_id
+            byte_offset = posting_offsets[skip_idx]
+            skips.append((docid, byte_offset))
+        return skips
+
     def _merge_chunks(self) -> None:
         """
         Hace el merge de los chunks parciales para crear el índice final en disco, siguiendo el algoritmo multi-way merge según MAN08.
         Utiliza PostingChunk en modo lectura secuencial para cada chunk.
         """
         chunk_objs = [PostingChunk(file_path=chunk_path) for chunk_path in self.chunks]
-        heap: list[tuple[int, int, int, PartialPosting]] = (
-            []
-        )  # (term_id, doc_id, chunk_id, PartialPosting)
-
-        # Leer el primer registro de cada chunk y agregarlo al heap
+        heap: list[tuple[int, int, int, PartialPosting]] = []
+        # (term_id, doc_id, chunk_id, PartialPosting)
         for chunk_id, chunk in enumerate(chunk_objs):
             pp = chunk.get_current()
             if pp is not None:
                 heapq.heappush(heap, (pp.term_id, pp.doc_id, chunk_id, pp))
-
-        # Abrir archivo final de postings en modo escritura binaria y crear el índice final
+                
+        skips_dict: dict[str, list[tuple[int, int]]] = {}
         with open(self.path_index + f"/{self.POSTINGS_FILENAME}", "wb") as final_index_file:
             offset = 0
             current_term_id = None
             current_posting_list: list[Posting] = []
-
+            current_posting_offsets: list[int] = []
             while heap:
                 term_id, _, chunk_id, pp = heapq.heappop(heap)
-                if current_term_id is None:  # solo para la primera iteración
+                if current_term_id is None:
                     current_term_id = term_id
-
-                # Si el término actual es diferente al anterior, escribir la posting list actual (porque ya está completa) y agregar el término al vocabulario
                 if term_id != current_term_id:
-                    for posting in current_posting_list:
-                        final_index_file.write(posting.to_bytes())
-                    # Guardar en vocabulario: offset y df
-                    self.vocabulary[self.id2term[current_term_id]] = {
-                        "puntero": offset,
-                        "df": len(current_posting_list),
-                    }
-                    offset += 8 * len(current_posting_list)
-                    # Reset
+                    self._write_posting_and_skips(final_index_file, current_term_id, current_posting_list, current_posting_offsets, offset, skips_dict)
+                    offset += self.POSTING_SIZE * len(current_posting_list)
                     current_term_id = term_id
                     current_posting_list = []
-
+                    current_posting_offsets = []
                 current_posting_list.append(Posting(pp.doc_id, pp.freq))
-
-                # Avanzar en el chunk correspondiente (extraido de la cabeza del heap)
                 chunk = chunk_objs[chunk_id]
                 chunk.next()
                 next_pp = chunk.get_current()
                 if next_pp is not None:
-                    heapq.heappush(
-                        heap, (next_pp.term_id, next_pp.doc_id, chunk_id, next_pp)
-                    )
-            else:   # END WHILE
-                # Escribir la última posting list
+                    heapq.heappush(heap, (next_pp.term_id, next_pp.doc_id, chunk_id, next_pp))
+            else:
                 if current_posting_list and current_term_id is not None:
-                    for posting in current_posting_list:
-                        final_index_file.write(posting.to_bytes())
-                    self.vocabulary[self.id2term[current_term_id]] = {
-                        "puntero": offset,
-                        "df": len(current_posting_list),
-                    }
-
-        # Cerrar todos los chunks
+                    self._write_posting_and_skips(final_index_file, current_term_id, current_posting_list, current_posting_offsets, offset, skips_dict)
+        self._write_skip_lists(skips_dict)
         for chunk in chunk_objs:
             chunk.close()
+
+    def _write_posting_and_skips(self, final_index_file, term_id, posting_list: list[Posting], posting_offsets: list[int], offset: int, skips_dict: dict[str, list[tuple[int, int]]]):
+        """
+        Escribe la posting list y actualiza el vocabulario y skips_dict para el término dado.
+        posting_offsets se llena correctamente con el offset en bytes de cada posting.
+        """
+        posting_offsets.clear()  # Asegura que esté vacía antes de empezar
+        for i, posting in enumerate(posting_list):
+            final_index_file.write(posting.to_bytes())
+            posting_offsets.append(offset + i * self.POSTING_SIZE)
+        self.vocabulary[self.id2term[term_id]] = {
+            "puntero": offset,
+            "df": len(posting_list),
+        }
+        skips = self._process_skip_list(posting_list, posting_offsets)
+        if skips:
+            skips_dict[self.id2term[term_id]] = skips
+        posting_offsets.clear()  # Limpia para la próxima posting list
+
+    def _write_skip_lists(self, skips_dict):
+        skips_path = os.path.join(self.path_index, self.SKIPS_FILENAME)
+        with open(skips_path, "wb") as f:
+            print(f"Escribiendo skips en {skips_path}")
+            pickle.dump(skips_dict, f)
 
     def _write_vocabulary(self) -> None:
         """
@@ -202,6 +221,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         vocab_path = os.path.join(self.path_index, self.VOCABULARY_FILENAME)
         with open(vocab_path, "wb") as f:
+            print(f"Escribiendo vocabulario en {vocab_path}")
             pickle.dump(self.vocabulary, f)
 
     def _load_vocabulary(self) -> None:
@@ -220,6 +240,19 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         if not self.vocabulary:
             self._load_vocabulary()
         return self.vocabulary
+
+    def _load_skips(self) -> None:
+        skips_path = os.path.join(self.path_index, self.SKIPS_FILENAME)
+        if os.path.exists(skips_path):
+            with open(skips_path, "rb") as f:
+                self.skips = pickle.load(f)
+
+
+    def get_skips(self) -> dict:
+        if not hasattr(self, "skips") or self.skips is None:
+            self._load_skips()
+        return self.skips if hasattr(self, "skips") else {}
+    
 
     def index_size_on_disk(self) -> Dict[str, int]:
         """
@@ -248,6 +281,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         metadata_path = os.path.join(self.path_index, self.METADATA_FILENAME)
         with open(metadata_path, "wb") as f:
+            print(f"Escribiendo metadata en {metadata_path}")
             pickle.dump(self.doc_id_map, f)
 
     def _load_metadata(self) -> None:

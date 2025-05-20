@@ -1,11 +1,13 @@
-from .IndexadorBSBI import IndexadorBSBI
-from lib.IRSystem import IRSystem
-from lib.Posting import Posting
+import heapq
 import os
+from collections import Counter
+
 import boolean
 import numpy as np
-from collections import Counter
-import heapq
+from lib.IRSystem import IRSystem
+from lib.Posting import Posting
+from lib.IndexadorBSBI import IndexadorBSBI
+from lib.SkipList import SkipList
 
 
 class IRSystemBSBI(IRSystem):
@@ -44,7 +46,6 @@ class IRSystemBSBI(IRSystem):
         """
         V = len(self.term_index)
         vec = np.zeros(V, dtype=float)
-        print(f"Vector de tamaño {V} para {tf_counter} términos")
         for term, freq in tf_counter.items():
             if term in self.analyzer.vocabulary:
                 # No implementado el IDF
@@ -170,3 +171,68 @@ class IRSystemBSBI(IRSystem):
                 posting = Posting.from_bytes(data)
                 resultado.append(posting)
         return resultado
+
+    def get_skip_list_from_term(self, term: str) -> list[tuple[int, int]]:
+        skips_dict = self.analyzer.get_skips()
+        return skips_dict.get(term, [])
+
+    def taat_query_with_skips(self, query: str) -> list[tuple[int, str]]:
+        """
+        Evalúa una consulta TAAT AND entre dos términos usando skips (offsets en bytes).
+        Utiliza la clase SkipList para saltar en disco.
+        Devuelve los documentos que la satisfacen (docid, docname).
+        Solo soporta queries AND de dos términos.
+        """
+        import re
+        m = re.match(r"^(\w+)\s+AND\s+(\w+)$", query.strip(), re.IGNORECASE)
+        if not m:
+            raise ValueError("Solo se soportan queries AND de dos términos para skips.")
+
+        t1, t2 = m.group(1), m.group(2)
+        vocabulary = self.analyzer.get_vocabulary()
+        skips_dict = self.analyzer.get_skips()
+        doc_id_map = self.analyzer.get_doc_id_map()
+        postings_path = os.path.join(self.index_dir, self.analyzer.POSTINGS_FILENAME)
+        posting_size = self.analyzer.POSTING_SIZE
+
+        info1 = vocabulary.get(t1)
+        info2 = vocabulary.get(t2)
+        if not info1 or not info2:
+            return []
+        skips1 = SkipList(skips_dict.get(t1, []))
+        skips2 = SkipList(skips_dict.get(t2, []))
+
+        # Inicializar punteros y límites
+        i_ptr = info1["puntero"]
+        j_ptr = info2["puntero"]
+        i_end = i_ptr + info1["df"] * posting_size
+        j_end = j_ptr + info2["df"] * posting_size
+
+        res = []
+        with open(postings_path, "rb") as f:
+            while i_ptr < i_end and j_ptr < j_end:
+                # Leer postings actuales
+                f.seek(i_ptr)
+                p1 = Posting.from_bytes(f.read(posting_size))
+                f.seek(j_ptr)
+                p2 = Posting.from_bytes(f.read(posting_size))
+
+                if p1.doc_id == p2.doc_id:
+                    res.append((p1.doc_id, doc_id_map[p1.doc_id]))
+                    i_ptr += posting_size
+                    j_ptr += posting_size
+                elif p1.doc_id < p2.doc_id:
+                    # Usar skip list real para saltar en pl1
+                    next_skip_ptr = skips1.skip_to_offset(p2.doc_id, i_ptr)
+                    if next_skip_ptr and next_skip_ptr < i_end:
+                        i_ptr = next_skip_ptr
+                    else:
+                        i_ptr += posting_size
+                else:
+                    # Usar skip list real para saltar en pl2
+                    next_skip_ptr = skips2.skip_to_offset(p1.doc_id, j_ptr)
+                    if next_skip_ptr and next_skip_ptr < j_end:
+                        j_ptr = next_skip_ptr
+                    else:
+                        j_ptr += posting_size
+        return res
