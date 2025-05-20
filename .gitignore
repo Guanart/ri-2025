@@ -1,6 +1,7 @@
 # history
 .history
 datos
+queries
 *.bin
 *.pkl
 

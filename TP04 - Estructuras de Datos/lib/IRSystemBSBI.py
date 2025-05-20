@@ -5,6 +5,7 @@ import os
 import boolean
 import numpy as np
 from collections import Counter
+import heapq
 
 
 class IRSystemBSBI(IRSystem):
@@ -54,17 +55,6 @@ class IRSystemBSBI(IRSystem):
                 vec[idx] = tf_weight
         return vec
 
-    # def _build_doc_vectors(self) -> None:
-    #     """
-    #     Construye los vectores de documentos y sus normas (genera el espacio vectorial).
-    #     Usa self.analyzer.get_doc_terms() para obtener los términos y frecuencias de cada documento.
-    #     """
-    #     doc_terms = self.analyzer.get_doc_terms()  # doc_terms ==  {docid: Counter(term: freq)}
-    #     for docid, tf_counter in doc_terms.items():
-    #         vec = self._make_vector(tf_counter)
-    #         self.doc_vectors[docid] = vec
-    #         self.doc_norms[docid] = np.linalg.norm(vec)
-
     def index_collection(self, path: str) -> None:
         if os.path.exists(self.index_dir):
             print("El índice ya existe. No se realizará la indexación.")
@@ -81,38 +71,55 @@ class IRSystemBSBI(IRSystem):
         Ejecuta una consulta vectorial DAAT sobre el índice BSBI usando solo TF crudo.
         Devuelve los top-k documentos con mayor score coseno.
         """
-        # 1) Construir vector de consulta
+        # 1) Construir vector de consulta y su norma
         tokens = self.analyzer.tokenizer.tokenizar(text)
         tf_query = Counter(tokens)
+        if not tf_query:
+            return []
         q_vec = self._make_vector(tf_query)
         norm_q = np.linalg.norm(q_vec)
-        # Recupera posting lists de los términos de la consulta
-        posting_lists: dict[str, list[Posting]] = {term: self.get_term_from_posting_list(term) for term in tf_query}
-        # Junta todos los docIDs candidatos
-        candidate_docids = set()
-        for plist in posting_lists.values():
-            for posting in plist:
-                candidate_docids.add(posting.doc_id)
-        candidate_docids = sorted(candidate_docids)  # Ordenar por doc_id
-        # Calcula el score para cada documento candidato
-        results: list[tuple[str, int, float]] = []
+        if norm_q == 0:
+            return []
+
+        # 2) Recuperar posting‐lists de cada término de la query
+        posting_lists = {
+            term: self.get_term_from_posting_list(term) for term in tf_query
+        }
+
+        # 3) Construir el set de candidatos (docIDs)
+        candidate_docids = sorted(
+            {p.doc_id for plist in posting_lists.values() for p in plist}
+        )
+
+        # 4) Calcula el score para cada documento candidato
+        heap: list[tuple[float, int, str]] = []
         for docid in candidate_docids:
             tf_doc = Counter()
             for term, plist in posting_lists.items():
-                for posting in plist:
-                    if posting.doc_id == docid:
-                        tf_doc[term] = posting.freq
+                for p in plist:
+                    if p.doc_id == docid:
+                        tf_doc[term] = p.freq
                         break
+
             d_vec = self._make_vector(tf_doc)
             norm_d = np.linalg.norm(d_vec)
-            if norm_d == 0 or norm_q == 0:
+            if norm_d == 0:
                 continue
-            score = np.dot(q_vec, d_vec) / (norm_q * norm_d)
+
+            score = float(np.dot(q_vec, d_vec) / (norm_q * norm_d))
             docname = self.analyzer.doc_id_map.get(docid, str(docid))
-            print(f"DocID: {docid}, DocName: {docname}, Score: {score:.4f}")
-            results.append((docname, docid, score))
-        results.sort(key=lambda x: -x[2])   # Ordenar por score descendente
-        return results[:top_k]
+
+            # 5) Modificar Top-k
+            if len(heap) < top_k:
+                heapq.heappush(heap, (score, docid, docname))
+            else:
+                # si el nuevo score supera el mínimo actual, lo reemplazamos
+                if score > heap[0][0]:
+                    heapq.heapreplace(heap, (score, docid, docname))
+
+        # 6) Ordenar los k resultados y devolver [(docname, docid, score), ...]
+        heap.sort(key=lambda x: -x[0])
+        return [(docname, docid, score) for score, docid, docname in heap]
 
     def taat_query(self, query: str) -> list[tuple[int, str]]:
         """
