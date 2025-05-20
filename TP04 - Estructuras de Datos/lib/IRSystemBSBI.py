@@ -4,7 +4,6 @@ from lib.Posting import Posting
 import os
 import boolean
 import numpy as np
-import math
 from collections import Counter
 
 
@@ -25,8 +24,10 @@ class IRSystemBSBI(IRSystem):
         self.term_index: dict[str, int] = {}
         self.doc_vectors: dict[str, np.ndarray] = {}
         self.doc_norms: dict[str, float] = {}
-        self._make_term_index()
-        # self._build_doc_vectors()
+
+        if self.analyzer.get_vocabulary() is not None:
+            self._make_term_index()
+
 
     def _make_term_index(self) -> None:
         """
@@ -42,6 +43,7 @@ class IRSystemBSBI(IRSystem):
         """
         V = len(self.term_index)
         vec = np.zeros(V, dtype=float)
+        print(f"Vector de tamaño {V} para {tf_counter} términos")
         for term, freq in tf_counter.items():
             if term in self.analyzer.vocabulary:
                 # No implementado el IDF
@@ -68,12 +70,18 @@ class IRSystemBSBI(IRSystem):
             print("El índice ya existe. No se realizará la indexación.")
             return
         self.analyzer.index_collection(path)
+        if self.analyzer.get_vocabulary() is not None:
+            self._make_term_index()
 
-    def query(self, text: str, top_k: int = 10, **kwargs) -> list[tuple[str, int, float]]:
+    def query(self, text: str, **kwargs: object):
+        return super().query(text, **kwargs)
+
+    def daat_query(self, text: str, top_k: int = 10, **kwargs) -> list[tuple[str, int, float]]:
         """
         Ejecuta una consulta vectorial DAAT sobre el índice BSBI usando solo TF crudo.
         Devuelve los top-k documentos con mayor score coseno.
         """
+        # 1) Construir vector de consulta
         tokens = self.analyzer.tokenizer.tokenizar(text)
         tf_query = Counter(tokens)
         q_vec = self._make_vector(tf_query)
@@ -85,22 +93,25 @@ class IRSystemBSBI(IRSystem):
         for plist in posting_lists.values():
             for posting in plist:
                 candidate_docids.add(posting.doc_id)
+        candidate_docids = sorted(candidate_docids)  # Ordenar por doc_id
         # Calcula el score para cada documento candidato
-        results = []
+        results: list[tuple[str, int, float]] = []
         for docid in candidate_docids:
             tf_doc = Counter()
             for term, plist in posting_lists.items():
                 for posting in plist:
                     if posting.doc_id == docid:
                         tf_doc[term] = posting.freq
+                        break
             d_vec = self._make_vector(tf_doc)
             norm_d = np.linalg.norm(d_vec)
             if norm_d == 0 or norm_q == 0:
                 continue
             score = np.dot(q_vec, d_vec) / (norm_q * norm_d)
             docname = self.analyzer.doc_id_map.get(docid, str(docid))
+            print(f"DocID: {docid}, DocName: {docname}, Score: {score:.4f}")
             results.append((docname, docid, score))
-        results.sort(key=lambda x: -x[2])
+        results.sort(key=lambda x: -x[2])   # Ordenar por score descendente
         return results[:top_k]
 
     def taat_query(self, query: str) -> list[tuple[int, str]]:

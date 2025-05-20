@@ -25,21 +25,28 @@ def main():
         default=10,
         help="Cantidad de documentos a retornar (top-k)",
     )
+    parser.add_argument(
+        "--path-stopwords",
+        type=str,
+        required=False,
+        default=None,
+        help="Ruta al archivo de stopwords (opcional).",
+    )
     args = parser.parse_args()
 
-    tokenizer = Tokenizador()
+    tokenizer = Tokenizador(stopwords_path=args.path_stopwords)
     analyzer = IndexadorBSBI(tokenizer)
     irsys = IRSystemBSBI(analyzer)
     irsys.index_collection(args.corpus_path)
 
-    resultados = irsys.query(args.query, top_k=args.top_k)
+    resultados: list[tuple[str, int, float]] = irsys.daat_query(args.query, top_k=args.top_k)
 
     if not resultados:
         print("No se encontraron documentos para la consulta.")
         return
     print(f"Resultados para la consulta '{args.query}':")
-    for docid, score in resultados:
-        print(f"{docid}:{score:.4f}")
+    for docname, docid, score in resultados:
+        print(f"{docname}{docid}:{score:.4f}")
 
 if __name__ == "__main__":
     main()

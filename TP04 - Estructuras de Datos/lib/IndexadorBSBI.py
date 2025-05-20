@@ -17,6 +17,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
     # Constantes de archivos y tamaños
     VOCABULARY_FILENAME = "vocabulary.pkl"
     POSTINGS_FILENAME = "final_index.bin"
+    METADATA_FILENAME = "metadata.pkl"
     DOCID_SIZE = 4  # bytes
     FREQ_SIZE = 4  # bytes
     POSTING_STRUCT_FORMAT = "II"  # 2 unsigned ints
@@ -147,7 +148,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                 heapq.heappush(heap, (pp.term_id, pp.doc_id, chunk_id, pp))
 
         # Abrir archivo final de postings en modo escritura binaria y crear el índice final
-        with open(self.path_index + "/final_index.bin", "wb") as final_index_file:
+        with open(self.path_index + f"/{self.POSTINGS_FILENAME}", "wb") as final_index_file:
             offset = 0
             current_term_id = None
             current_posting_list: list[Posting] = []
@@ -199,7 +200,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         Persiste el vocabulario en disco (por ejemplo, usando pickle).
         """
-        vocab_path = os.path.join(self.path_index, "vocabulary.pkl")
+        vocab_path = os.path.join(self.path_index, self.VOCABULARY_FILENAME)
         with open(vocab_path, "wb") as f:
             pickle.dump(self.vocabulary, f)
 
@@ -207,9 +208,10 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         Carga el vocabulario desde disco a memoria.
         """
-        vocab_path = os.path.join(self.path_index, "vocabulary.pkl")
-        with open(vocab_path, "rb") as f:
-            self.vocabulary = pickle.load(f)
+        vocab_path = os.path.join(self.path_index, self.VOCABULARY_FILENAME)
+        if os.path.exists(vocab_path):
+            with open(vocab_path, "rb") as f:
+                self.vocabulary = pickle.load(f)
 
     def get_vocabulary(self) -> Dict[str, Dict[str, int]]:
         """
@@ -244,7 +246,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         Persiste el doc_id_map en disco.
         """
-        metadata_path = os.path.join(self.path_index, "metadata.pkl")
+        metadata_path = os.path.join(self.path_index, self.METADATA_FILENAME)
         with open(metadata_path, "wb") as f:
             pickle.dump(self.doc_id_map, f)
 
@@ -252,7 +254,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         Carga el doc_id_map desde disco a memoria.
         """
-        metadata_path = os.path.join(self.path_index, "metadata.pkl")
+        metadata_path = os.path.join(self.path_index, self.METADATA_FILENAME)
         if os.path.exists(metadata_path):
             with open(metadata_path, "rb") as f:
                 self.doc_id_map = pickle.load(f)
