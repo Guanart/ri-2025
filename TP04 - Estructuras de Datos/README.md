@@ -5,3 +5,10 @@ Se incluye un script ejercicio1/ejercicio1.py donde se puede consultar la postin
 #  Ejecutar desde la raíz del TP (ejemplo con documentos en directorio /datos)
 python3 -m ejercicio1.ejercicio1 --corpus-path datos/en/articles --termino president
 ```
+
+## Ejercicio 5
+```bash
+#  Ejecutar desde la raíz del TP (ejemplo con documentos en directorio /datos)
+python3 -m ejercicio5.ejercicio5 --corpus-path datos/en/articles --queries-file EFF-10K-queries.txt
+python3 -m ejercicio5.ejercicio5_1 --corpus-path datos/en/articles --termino president
+```
