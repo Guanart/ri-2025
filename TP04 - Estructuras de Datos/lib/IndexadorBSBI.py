@@ -19,6 +19,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
     POSTINGS_FILENAME = "final_index.bin"
     METADATA_FILENAME = "metadata.pkl"
     SKIPS_FILENAME = "skips.pkl"
+    DOC_VECTORS_FILENAME = "doc_vectors.pkl"
     DOCID_SIZE = 4  # bytes
     FREQ_SIZE = 4  # bytes
     POSTING_STRUCT_FORMAT = "II"  # 2 unsigned ints
@@ -29,6 +30,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         tokenizer: Tokenizador,
         memory_limit: int = 1000,
         path_index: str = "index",
+        precalc_doc_vectors: bool = False,
     ):
         super().__init__(tokenizer)
         self.memory_limit: int = memory_limit
@@ -41,6 +43,8 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         self.term2id: Dict[str, int] = {}
         self.id2term: Dict[int, str] = {}
         self.doc_id_map: Dict[int, str] = {}  # doc_id -> nombre del archivo
+        self.precalc_doc_vectors = precalc_doc_vectors
+        self._doc_vectors: dict = {}
 
     def index_collection(self, docs_path: str) -> None:
         """
@@ -83,6 +87,9 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                             PartialPosting(term_id, doc_id, freq)
                         )
                     self.doc_id_map[doc_id] = doc_name
+                    # --- GUARDAR VECTOR DEL DOCUMENTO ---
+                    if self.precalc_doc_vectors:
+                        self._doc_vectors[doc_id] = terms_freq.copy()
 
         # Procesar el último chunk
         if len(current_chunk_postings) > 0:
@@ -300,6 +307,34 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         if not self.doc_id_map:
             self._load_metadata()
         return self.doc_id_map
+
+    def _write_doc_vectors(self):
+        """
+        Guarda los vectores de documentos en un archivo pickle.
+        """
+        vectors_path = os.path.join(self.path_index, self.DOC_VECTORS_FILENAME)
+        with open(vectors_path, "wb") as f:
+            print(f"Escribiendo vectores de documentos en {vectors_path}")
+            pickle.dump(self._doc_vectors, f)
+
+    def _load_doc_vectors(self):
+        if self._doc_vectors is None:
+            vectors_path = os.path.join(self.path_index, self.DOC_VECTORS_FILENAME)
+            if os.path.exists(vectors_path):
+                with open(vectors_path, "rb") as f:
+                    self._doc_vectors = pickle.load(f)
+            else:
+                self._doc_vectors = {}
+
+    def get_doc_terms(self, docid: int) -> Counter:
+        """
+        Devuelve un Counter con los términos y frecuencias de un documento dado.
+        Usa los vectores precalculados si están disponibles y activados.
+        """
+        if self.precalc_doc_vectors:
+            self._load_doc_vectors()
+            return self._doc_vectors.get(docid, Counter())
+        return Counter()
 
     # ESTO LO PUSE POR LA ABSTRACT CLASS
 

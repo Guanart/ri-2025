@@ -58,16 +58,19 @@ class IRSystemBSBI(IRSystem):
 
     def index_collection(self, path: str) -> None:
         if os.path.exists(self.index_dir):
-            print("El índice ya existe. No se realizará la indexación.")
+            print("El índice ya existe. No se realizará la indexación.\n")
             return
         self.analyzer.index_collection(path)
         if self.analyzer.get_vocabulary() is not None:
             self._make_term_index()
+        print()
 
     def query(self, text: str, **kwargs: object):
         return super().query(text, **kwargs)
 
-    def daat_query(self, text: str, top_k: int = 10, **kwargs) -> list[tuple[str, int, float]]:
+    def daat_query(
+        self, text: str, top_k: int = 10, **kwargs
+    ) -> list[tuple[str, int, float]]:
         """
         Ejecuta una consulta vectorial DAAT sobre el índice BSBI usando solo TF crudo.
         Devuelve los top-k documentos con mayor score coseno.
@@ -95,13 +98,9 @@ class IRSystemBSBI(IRSystem):
         # 4) Calcula el score para cada documento candidato
         heap: list[tuple[float, int, str]] = []
         for docid in candidate_docids:
-            tf_doc = Counter()
-            for term, plist in posting_lists.items():
-                for p in plist:
-                    if p.doc_id == docid:
-                        tf_doc[term] = p.freq
-                        break
-
+            tf_doc = self.analyzer.get_doc_terms(
+                docid
+            )
             d_vec = self._make_vector(tf_doc)
             norm_d = np.linalg.norm(d_vec)
             if norm_d == 0:
@@ -121,7 +120,7 @@ class IRSystemBSBI(IRSystem):
         # 6) Ordenar los k resultados y devolver [(docname, docid, score), ...]
         heap.sort(key=lambda x: -x[0])
         return [(docname, docid, score) for score, docid, docname in heap]
-
+    
     def taat_query(self, query: str) -> list[tuple[int, str]]:
         """
         Evalúa una consulta booleana TAAT (Term At A Time) y devuelve los documentos que la satisfacen.

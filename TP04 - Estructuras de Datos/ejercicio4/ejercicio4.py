@@ -35,7 +35,7 @@ def main():
     args = parser.parse_args()
 
     tokenizer = Tokenizador(stopwords_path=args.path_stopwords)
-    analyzer = IndexadorBSBI(tokenizer)
+    analyzer = IndexadorBSBI(tokenizer, precalc_doc_vectors=True)
     irsys = IRSystemBSBI(analyzer)
     irsys.index_collection(args.corpus_path)
 
@@ -46,7 +46,7 @@ def main():
         return
     print(f"Resultados para la consulta '{args.query}':")
     for docname, docid, score in resultados:
-        print(f"{docname}{docid}:{score:.4f}")
+        print(f"{docname}:{docid}:{score:.4f}")
 
 if __name__ == "__main__":
     main()
