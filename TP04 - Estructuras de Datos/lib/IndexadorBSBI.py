@@ -107,6 +107,8 @@ class IndexadorBSBI(CollectionAnalyzerBase):
 
         self._write_vocabulary()
         self._write_metadata()
+        if self.precalc_doc_vectors:
+            self._write_doc_vectors()
 
     def _process_doc(self, fname: str, root: str, path: str) -> tuple[list[str], str]:
         with open(os.path.join(root, fname), encoding="utf8", errors="ignore") as f:
