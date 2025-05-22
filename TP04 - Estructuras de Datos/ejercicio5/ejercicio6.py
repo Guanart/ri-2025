@@ -12,9 +12,7 @@ class IRSystemDump10k(IRSystemBSBI):
     def __init__(self, analyzer):
         super().__init__(analyzer)
 
-    def taat_and(self, terms):
-        # AND puro, sin boolean.py, sobre listas de docIDs
-        postings_lists = [self.analyzer.vocabulary.get(t, {}).get("postings", []) for t in terms]
+    def taat(self, postings_lists: list[dict[str,int]]):
         if not postings_lists or any(len(pl)==0 for pl in postings_lists):
             return []
         result = postings_lists[0]
@@ -35,8 +33,7 @@ class IRSystemDump10k(IRSystemBSBI):
                 break
         return result
 
-    def daat_and(self, terms):
-        postings_lists = [self.analyzer.vocabulary.get(t, {}).get("postings", []) for t in terms]
+    def daat(self, postings_lists: list[dict[str, int]]):
         if not postings_lists or any(len(pl)==0 for pl in postings_lists):
             return []
         pointers = [0] * len(postings_lists)
@@ -64,6 +61,61 @@ class IRSystemDump10k(IRSystemBSBI):
 def load_queries(filepath):
     with open(filepath, "r", encoding="utf8") as f:
         return [line.strip() for line in f if line.strip()]
+
+def print_summary(results, title):
+    if not results:
+        print(f"\nNo hay resultados para {title}.")
+        return
+    results = sorted(results, key=lambda x: x[2])
+    print(f"\n{'=' * 20} {title} {'=' * 20}")
+    print("{:<40} {:>10} {:>12}".format("Query", "Resultados", "Tiempo (s)"))
+    print("-" * 70)
+    for q, nres, t, _, _ in results[:10]:
+        print("{:<40} {:>10} {:>12.6f}".format(q, nres, t))
+    if len(results) > 20:
+        print("...")
+    for q, nres, t, _, _ in results[-10:]:
+        print("{:<40} {:>10} {:>12.6f}".format(q, nres, t))
+
+def analyze_by_length(results):
+    by_q_len = defaultdict(list)
+    by_post_len = defaultdict(list)
+    for q, nres, t, qlen, postlens in results:
+        by_q_len[qlen].append(t)
+        for plen in postlens:
+            by_post_len[plen].append(t)
+    print("\n--- Análisis por longitud de query ---")
+    for qlen in sorted(by_q_len):
+        times = by_q_len[qlen]
+        print(
+            f"Query len={qlen}: {len(times)} queries, tiempo promedio={sum(times) / len(times):.6f}s"
+        )
+    print(
+        "\n--- Análisis por longitud de posting list (top 10 más frecuentes, min y max) ---"
+    )
+    # Mostrar solo los 10 tamaños de posting list más frecuentes, y los extremos
+    freq = sorted(by_post_len.items(), key=lambda x: -len(x[1]))
+    shown = set()
+    for plen, times in freq[:10]:
+        print(
+            f"Posting len={plen}: {len(times)} apariciones, tiempo promedio={sum(times) / len(times):.6f}s"
+        )
+        shown.add(plen)
+    # Mostrar el mínimo y máximo si no están incluidos
+    if by_post_len:
+        min_plen = min(by_post_len)
+        max_plen = max(by_post_len)
+        if min_plen not in shown:
+            times = by_post_len[min_plen]
+            print(
+                f"Posting len={min_plen}: {len(times)} apariciones, tiempo promedio={sum(times) / len(times):.6f}s (mínimo)"
+            )
+        if max_plen not in shown:
+            times = by_post_len[max_plen]
+            print(
+                f"Posting len={max_plen}: {len(times)} apariciones, tiempo promedio={sum(times) / len(times):.6f}s (máximo)"
+            )
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -96,7 +148,7 @@ def main():
 
     for q in queries:
         terms = q.strip().split()
-        postings_lists = []
+        postings_lists: list[dict[str,int]] = []
         postlens = []
         for t in terms:
             plist = indexador.vocabulary.get(t, {}).get("postings", [])
@@ -107,59 +159,15 @@ def main():
 
         # TAAT usando IRSystemDump10k
         t0 = time.time()
-        res_taat = irsys.taat_and(terms)
+        res_taat = irsys.taat(postings_lists)
         t1 = time.time()
         results_taat.append((q, len(res_taat), t1-t0, len(terms), postlens))
 
         # DAAT usando IRSystemDump10k
         t0 = time.time()
-        res_daat = irsys.daat_and(terms)
+        res_daat = irsys.daat(postings_lists)
         t1 = time.time()
         results_daat.append((q, len(res_daat), t1-t0, len(terms), postlens))
-
-    def print_summary(results, title):
-        if not results:
-            print(f"\nNo hay resultados para {title}.")
-            return
-        results = sorted(results, key=lambda x: x[2])
-        print(f"\n{'=' * 20} {title} {'=' * 20}")
-        print("{:<40} {:>10} {:>12}".format("Query", "Resultados", "Tiempo (s)"))
-        print("-" * 70)
-        for q, nres, t, _, _ in results[:10]:
-            print("{:<40} {:>10} {:>12.6f}".format(q, nres, t))
-        if len(results) > 20:
-            print("...")
-        for q, nres, t, _, _ in results[-10:]:
-            print("{:<40} {:>10} {:>12.6f}".format(q, nres, t))
-
-    def analyze_by_length(results):
-        by_q_len = defaultdict(list)
-        by_post_len = defaultdict(list)
-        for q, nres, t, qlen, postlens in results:
-            by_q_len[qlen].append(t)
-            for plen in postlens:
-                by_post_len[plen].append(t)
-        print("\n--- Análisis por longitud de query ---")
-        for qlen in sorted(by_q_len):
-            times = by_q_len[qlen]
-            print(f"Query len={qlen}: {len(times)} queries, tiempo promedio={sum(times)/len(times):.6f}s")
-        print("\n--- Análisis por longitud de posting list (top 10 más frecuentes, min y max) ---")
-        # Mostrar solo los 10 tamaños de posting list más frecuentes, y los extremos
-        freq = sorted(by_post_len.items(), key=lambda x: -len(x[1]))
-        shown = set()
-        for plen, times in freq[:10]:
-            print(f"Posting len={plen}: {len(times)} apariciones, tiempo promedio={sum(times)/len(times):.6f}s")
-            shown.add(plen)
-        # Mostrar el mínimo y máximo si no están incluidos
-        if by_post_len:
-            min_plen = min(by_post_len)
-            max_plen = max(by_post_len)
-            if min_plen not in shown:
-                times = by_post_len[min_plen]
-                print(f"Posting len={min_plen}: {len(times)} apariciones, tiempo promedio={sum(times)/len(times):.6f}s (mínimo)")
-            if max_plen not in shown:
-                times = by_post_len[max_plen]
-                print(f"Posting len={max_plen}: {len(times)} apariciones, tiempo promedio={sum(times)/len(times):.6f}s (máximo)")
 
     print_summary(results_taat, "TAAT (AND)")
     print_summary(results_daat, "DAAT (AND)")
