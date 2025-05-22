@@ -69,7 +69,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Evalúa TAAT y DAAT sobre dump10k.txt y compara tiempos."
     )
-    parser.add_argument("--index-file", required=True, help="Archivo dump10k.txt")
+    parser.add_argument("--corpus-path", required=True, help="Archivo dump10k.txt")
     parser.add_argument("--queries-file", required=True, help="Archivo de queries")
     args = parser.parse_args()
 
@@ -78,7 +78,7 @@ def main():
     indexador = IndexadorBSBI(tokenizer)
     # Cargar el vocabulario desde dump10k.txt (sin docnames ni frecuencias, frecuencia=1)
     indexador.vocabulary = {}
-    with open(args.index_file, "r", encoding="utf8") as f:
+    with open(args.corpus_path, "r", encoding="utf8") as f:
         for line in f:
             parts = line.strip().split(":")
             if len(parts) < 3:
@@ -143,10 +143,23 @@ def main():
         for qlen in sorted(by_q_len):
             times = by_q_len[qlen]
             print(f"Query len={qlen}: {len(times)} queries, tiempo promedio={sum(times)/len(times):.6f}s")
-        print("\n--- Análisis por longitud de posting list ---")
-        for plen in sorted(by_post_len):
-            times = by_post_len[plen]
+        print("\n--- Análisis por longitud de posting list (top 10 más frecuentes, min y max) ---")
+        # Mostrar solo los 10 tamaños de posting list más frecuentes, y los extremos
+        freq = sorted(by_post_len.items(), key=lambda x: -len(x[1]))
+        shown = set()
+        for plen, times in freq[:10]:
             print(f"Posting len={plen}: {len(times)} apariciones, tiempo promedio={sum(times)/len(times):.6f}s")
+            shown.add(plen)
+        # Mostrar el mínimo y máximo si no están incluidos
+        if by_post_len:
+            min_plen = min(by_post_len)
+            max_plen = max(by_post_len)
+            if min_plen not in shown:
+                times = by_post_len[min_plen]
+                print(f"Posting len={min_plen}: {len(times)} apariciones, tiempo promedio={sum(times)/len(times):.6f}s (mínimo)")
+            if max_plen not in shown:
+                times = by_post_len[max_plen]
+                print(f"Posting len={max_plen}: {len(times)} apariciones, tiempo promedio={sum(times)/len(times):.6f}s (máximo)")
 
     print_summary(results_taat, "TAAT (AND)")
     print_summary(results_daat, "DAAT (AND)")
