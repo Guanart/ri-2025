@@ -177,61 +177,86 @@ class IRSystemBSBI(IRSystem):
 
     def taat_query_with_skips(self, query: str) -> list[tuple[int, str]]:
         """
-        Evalúa una consulta TAAT AND entre dos términos usando skips (offsets en bytes).
+        Evalúa una consulta TAAT AND entre múltiples términos usando skips (offsets en bytes).
         Utiliza la clase SkipList para saltar en disco.
         Devuelve los documentos que la satisfacen (docid, docname).
-        Solo soporta queries AND de dos términos.
+        Solo soporta queries AND de varios términos (no OR/NOT).
         """
         import re
-        m = re.match(r"^(\w+)\s+AND\s+(\w+)$", query.strip(), re.IGNORECASE)
-        if not m:
-            raise ValueError("Solo se soportan queries AND de dos términos para skips.")
+        # Extraer términos (solo AND, sin paréntesis ni OR/NOT)
+        terms = [t.strip() for t in re.split(r"\s+AND\s+", query.strip(), flags=re.IGNORECASE)]
+        if len(terms) < 2:
+            raise ValueError("La consulta debe tener al menos dos términos AND.")
 
-        t1, t2 = m.group(1), m.group(2)
         vocabulary = self.analyzer.get_vocabulary()
         skips_dict = self.analyzer.get_skips()
         doc_id_map = self.analyzer.get_doc_id_map()
         postings_path = os.path.join(self.index_dir, self.analyzer.POSTINGS_FILENAME)
         posting_size = self.analyzer.POSTING_SIZE
 
-        info1 = vocabulary.get(t1)
-        info2 = vocabulary.get(t2)
-        if not info1 or not info2:
-            return []
-        skips1 = SkipList(skips_dict.get(t1, []))
-        skips2 = SkipList(skips_dict.get(t2, []))
+        # Filtrar términos inexistentes
+        term_infos = []
+        for t in terms:
+            info = vocabulary.get(t)
+            if not info:
+                return []
+            term_infos.append((t, info["df"], info))
 
-        # Inicializar punteros y límites
-        i_ptr = info1["puntero"]
-        j_ptr = info2["puntero"]
-        i_end = i_ptr + info1["df"] * posting_size
-        j_end = j_ptr + info2["df"] * posting_size
+        # Ordenar términos por df ascendente (más selectivo primero)
+        term_infos.sort(key=lambda x: x[1])
+        ordered_terms = [x[0] for x in term_infos]
 
-        res = []
-        with open(postings_path, "rb") as f:
-            while i_ptr < i_end and j_ptr < j_end:
-                # Leer postings actuales
-                f.seek(i_ptr)
-                p1 = Posting.from_bytes(f.read(posting_size))
-                f.seek(j_ptr)
-                p2 = Posting.from_bytes(f.read(posting_size))
+        # Función para obtener posting list de un término como lista de doc_ids usando skips
+        def get_posting_docids(term: str) -> list[int]:
+            info = vocabulary[term]
+            ptr = info["puntero"]
+            end = ptr + info["df"] * posting_size
+            docids = []
+            with open(postings_path, "rb") as f:
+                while ptr < end:
+                    f.seek(ptr)
+                    posting = Posting.from_bytes(f.read(posting_size))
+                    docids.append(posting.doc_id)
+                    ptr += posting_size
+            return docids
 
-                if p1.doc_id == p2.doc_id:
-                    res.append((p1.doc_id, doc_id_map[p1.doc_id]))
-                    i_ptr += posting_size
-                    j_ptr += posting_size
-                elif p1.doc_id < p2.doc_id:
-                    # Usar skip list real para saltar en pl1
-                    next_skip_ptr = skips1.skip_to_offset(p2.doc_id, i_ptr)
-                    if next_skip_ptr and next_skip_ptr < i_end:
-                        i_ptr = next_skip_ptr
+        result_docids = get_posting_docids(ordered_terms[0])    # Lista de resultados parciales -> es inicializa con los doc_id del termino con menor df (posting list mas corta)
+
+        for idx in range(1, len(ordered_terms)):    # No incluye el primer término
+            # Recuperar info para recuperar posting list de t
+            t = ordered_terms[idx]
+            info = vocabulary[t]
+            skips = SkipList(skips_dict.get(t, []))  # skips de la segunda posting list mas corta
+            ptr = info["puntero"]
+            end = ptr + info["df"] * posting_size
+
+            new_result = []
+            i = 0  # índice en result_docids
+            with open(postings_path, "rb") as f:
+                # Avanzar por la posting list de t y result_docids en orden
+                while ptr < end and i < len(result_docids):
+                    f.seek(ptr)
+                    posting = Posting.from_bytes(f.read(posting_size))
+                    doc_id = posting.doc_id
+                    target = result_docids[i]
+                    if doc_id == target:
+                        # Si el doc_id de la posting de t es igual al de result_docids, lo guardamos y avanzamos ambos punteros de ambas listas
+                        new_result.append(doc_id)
+                        ptr += posting_size
+                        i += 1
+                    elif doc_id < target:
+                        # Si el doc_id de la posting de t es menor que el de result_docids, avanzamos en la posting list de t
+                        next_skip_ptr = skips.skip_to_offset(target, ptr)
+                        if next_skip_ptr and next_skip_ptr < end:
+                            ptr = next_skip_ptr
+                        else:
+                            ptr += posting_size
                     else:
-                        i_ptr += posting_size
-                else:
-                    # Usar skip list real para saltar en pl2
-                    next_skip_ptr = skips2.skip_to_offset(p1.doc_id, j_ptr)
-                    if next_skip_ptr and next_skip_ptr < j_end:
-                        j_ptr = next_skip_ptr
-                    else:
-                        j_ptr += posting_size
-        return res
+                        # Cuando el doc_id de result_docids es menor que el de t, ya no hay coincidencias posibles, así que avanzamos con el siguiente doc_id de result_docids
+                        # (la siguiente iteracion vuelve a comparar el siguiente doc_id de result_docids con el doc_id de t)
+                        i += 1
+            result_docids = new_result  # Almacenamos los resultados de la intersección para la siguiente interseccion del siguiente término (ya será más corta)
+            if not result_docids:
+                break
+
+        return [(docid, doc_id_map[docid]) for docid in result_docids]

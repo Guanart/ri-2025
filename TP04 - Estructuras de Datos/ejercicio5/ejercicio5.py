@@ -34,9 +34,14 @@ def main():
     patterns_2 = [
         "{0} AND {1}",
     ]
+    patterns_3 = [
+        "{0} AND {1} AND {2}",
+    ]
 
-    results_taat: list[tuple[str, int, float]] = []
-    results_skips: list[tuple[str, int, float]] = []
+    results_taat_2 = []
+    results_taat_3 = []
+    results_skips_2 = []
+    results_skips_3 = []
 
     for q in queries:
         terms = tokenizer.tokenizar(q)
@@ -48,32 +53,51 @@ def main():
                     t0 = time.time()
                     res = irsys.taat_query(query_str)
                     t1 = time.time()
-                    results_taat.append((query_str, len(res), t1 - t0))
+                    results_taat_2.append((query_str, len(res), t1 - t0))
                     # TAAT con skips
                     t0 = time.time()
                     res_skips = irsys.taat_query_with_skips(query_str)
                     t1 = time.time()
-                    results_skips.append((query_str, len(res_skips), t1 - t0))
+                    results_skips_2.append((query_str, len(res_skips), t1 - t0))
+                except Exception as e:
+                    print(f"Query inválida o no parseable: '{query_str}' ({e})")
+        elif len(terms) == 3 and all(t in vocabulary for t in terms):
+            for pat in patterns_3:
+                query_str = pat.format(*terms)
+                try:
+                    # TAAT clásico
+                    t0 = time.time()
+                    res = irsys.taat_query(query_str)
+                    t1 = time.time()
+                    results_taat_3.append((query_str, len(res), t1 - t0))
+                    # TAAT con skips
+                    t0 = time.time()
+                    res_skips = irsys.taat_query_with_skips(query_str)
+                    t1 = time.time()
+                    results_skips_3.append((query_str, len(res_skips), t1 - t0))
                 except Exception as e:
                     print(f"Query inválida o no parseable: '{query_str}' ({e})")
 
     def print_summary(results, title):
         if not results:
-            print(f"\nNo hay resultados para {title}.")
+            print(f"\nNo hay resultados para queries de {title}.")
             return
         results = sorted(results, key=lambda x: x[2])
-        print(f"\n{'=' * 20} {title} {'=' * 20}")
+        n = len(results)
+        print(f"\n{'='*20} {title} ({n} queries) {'='*20}")
         print("{:<40} {:>10} {:>12}".format("Query", "Resultados", "Tiempo (s)"))
         print("-" * 70)
         for q, nres, t in results[:10]:
             print("{:<40} {:>10} {:>12.6f}".format(q, nres, t))
-        if len(results) > 20:
+        if n > 20:
             print("...")
         for q, nres, t in results[-10:]:
             print("{:<40} {:>10} {:>12.6f}".format(q, nres, t))
 
-    print_summary(results_taat, "TAAT clásico")
-    print_summary(results_skips, "TAAT con skips")
+    print_summary(results_taat_2, "TAAT clásico - AND 2 términos")
+    print_summary(results_taat_3, "TAAT clásico - AND 3 términos")
+    print_summary(results_skips_2, "TAAT con skips - AND 2 términos")
+    print_summary(results_skips_3, "TAAT con skips - AND 3 términos")
 
 
 if __name__ == "__main__":
