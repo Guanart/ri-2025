@@ -31,3 +31,9 @@ python3 -m ejercicio5.ejercicio5_1 --corpus-path datos/en/articles --termino pre
 #  Ejecutar desde la raíz del TP
 python3 -m ejercicio6.ejercicio6 --corpus-path dump10k.txt --queries-file queriesDump10K.txt --top-k 10
 ```
+## Ejercicio 7
+```bash
+#  Ejecutar desde la raíz del TP
+python ejercicio7.py --index-dir index --dgaps
+python ejercicio7_1.py --index-dir index --termino TU_TERMINO --dgaps
+```
