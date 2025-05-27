@@ -18,6 +18,7 @@ def vbyte_encode_number(n: int) -> bytes:
         n >>= 7  # Desplaza n 7 bits a la derecha (elimina los 7 bits ya codificados)
         if n:
             bytes_list.append(byte)  # MSB=0 (no es el último byte)
+            # Se guardan primero los bytes menos significativos
         else:
             bytes_list.append(byte | 0b10000000)  # MSB=1 (último byte)
             break
@@ -58,49 +59,34 @@ def vbyte_decode_list(data: bytes) -> list[int]:
 
 # -------------------- Elias-gamma --------------------
 
-
-def Unary(x):
-    """
-    Codifica x en unario: (x-1) ceros seguidos de un 1.
-    Ejemplo: x=4 -> '0001'
-    """
-    return (x - 1) * "0" + "1"
-
-
-def Binary(x, length=1):
-    """
-    Codifica x en binario de longitud 'length' (rellenando con ceros a la izquierda si es necesario).
-    Ejemplo: x=3, length=4 -> '0011'
-    """
-    s = "{0:0%db}" % length
-    return s.format(x)
-
-
 def elias_gamma_encode_number(n: int) -> bitarray:
     """
     Codifica un entero n >= 1 en Elias-gamma (bitarray).
-    - Escribe el log2(n) en unario (cantidad de bits menos 1, en ceros, seguido de un 1).
-    - Luego escribe los bits binarios de n sin el bit más significativo.
-    Ejemplo: n=9 -> binario '1001' -> unario '0001' + binario '001' -> '0001001'
     """
     if n <= 0:
         raise ValueError("Elias-gamma solo para n >= 1")
-    bin_len = int(math.log2(n))  # Cantidad de bits binarios menos 1
-    b = n - 2**bin_len  # Parte binaria sin el bit más significativo
-    unary = Unary(bin_len + 1)  # Codificación unaria
-    binary = Binary(b, bin_len)  # Parte binaria
-    bits = unary + binary  # Concatenar ambos
-    return bitarray(bits)
+    bin_len = int(math.log2(n)) # redondea hacia abajo (numero base de la diapositiva)
+    offset = n - 2**bin_len  # offset   # si k=17, entonces offset = 1
+    ba = bitarray()
+    # Unario: bin_len ceros y un 1
+    ba.extend([0] * bin_len)
+    ba.append(1)
+    # Binario: los bits del offset en bin_len bits
+    # Para cada posición de bit desde el más significativo al menos significativo
+    for i in reversed(range(bin_len)):
+        # si k=17, entonces offset = 1 = 0b0001
+        # Extrae el bit en la posición 'i' de 'offset' y lo agrega a 'ba'
+        ba.append((offset >> i) & 0b00000001) # Desplaza los bits de offset a la derecha i posiciones, y enmascara con 1 para obtener el bit menos significativo, para agregar los bits de mayor a menor peso
+    return ba
 
-
-def elias_gamma_encode_list(nums: list[int]) -> bitarray:
+def elias_gamma_encode_list(nums: list[int]) -> bytes:
     """
-    Codifica una lista de enteros en Elias-gamma, concatenando la codificación de cada uno.
+    Codifica una lista de enteros en Elias-gamma, concatenando la codificación de cada uno y retorna bytes.
     """
     ba = bitarray()
     for n in nums:
         ba.extend(elias_gamma_encode_number(n))
-    return ba
+    return ba.tobytes()
 
 
 def elias_gamma_decode_list(ba: bitarray) -> list[int]:
@@ -111,25 +97,28 @@ def elias_gamma_decode_list(ba: bitarray) -> list[int]:
     - Lee esa cantidad de bits binarios y los concatena al 1 inicial.
     - Reconstruye el número original.
     """
-    nums = []
+    nums: list[int] = []
     i = 0
     n = len(ba)
     while i < n:
         # Leer unario: cuenta ceros hasta el primer 1
         unary_len = 0
-        while i < n and not ba[i]:
+        while i < n and not ba[i]:  # cuando ba[i]=1 corta
             unary_len += 1
             i += 1
         if i >= n:
             break  # Si llegamos al final, salimos
         i += 1  # Saltar el 1
         # Leer binario de unary_len bits
-        b = 0
-        for j in range(unary_len):
+        b = 0b10
+        # si k=17, entonces unary_len = 4
+        for shift in reversed(range(unary_len)):
+            # primera iteracion: shift=3, b=0b0000
             if i < n and ba[i]:
-                b |= 1 << (unary_len - 1 - j)
+                b |= 1 << shift # Desplaza 1 a la izquierda 'shift' veces y lo agrega a b
+                # primera iteracion: b=0b1000
             i += 1
-        val = (1 << unary_len) + b  # Reconstruir el número original
+        val = (1 << unary_len) + b  # Reconstruir el número original (le concatena el 1 mas significativo a izquierda)
         nums.append(val)
     return nums
 
@@ -139,7 +128,7 @@ def elias_gamma_decode_list(ba: bitarray) -> list[int]:
 
 def compute_dgaps(nums: list[int]) -> list[int]:
     """
-    Convierte una lista de enteros ordenados en DGaps (diferencias sucesivas).
+    Convierte una lista de enteros ordenados en DGaps.
     El primer elemento se mantiene igual, el resto es la diferencia con el anterior.
     Ejemplo: [3, 7, 10] -> [3, 4, 3]
     """
@@ -170,7 +159,9 @@ if __name__ == "__main__":
 
     for L in [3, 10, 100, 1000]:
         original = [randint(1, 100) for _ in range(L)]
-        ba = elias_gamma_encode_list(original)
+        eg_bytes = elias_gamma_encode_list(original)
+        ba = bitarray()
+        ba.frombytes(eg_bytes)
         decoded = elias_gamma_decode_list(ba)
         if original != decoded:
             print(f"[ERROR] Elias-gamma falla para lista de largo {L}")

@@ -55,9 +55,9 @@ def comprimir_postings(corpus_path, index_compressed_dir=None):
                 f.write(vbyte)
             with open(os.path.join(subdir, f"{termino}.freqs.eg.bin"), "wb") as f:
                 f.write(struct.pack('I', len(freqs)))  # Escribe la cantidad de frecuencias (4 bytes)
-                egamma.tofile(f)
+                f.write(egamma)
             docids_total += len(vbyte)
-            freqs_total += len(egamma.tobytes())
+            freqs_total += len(egamma)
         t1 = time.time()
         resultados.append(
             {
@@ -119,8 +119,9 @@ def descomprimir_postings(index_compressed_dir, vocab, use_dgaps):
             vb_bytes = f.read()
         with open(eg_path, "rb") as f:
             n_freqs = struct.unpack('I', f.read(4))[0]
+            eg_bytes = f.read()
             eg_bits = bitarray()
-            eg_bits.fromfile(f)
+            eg_bits.frombytes(eg_bytes)
         docids = vbyte_decode_list(vb_bytes)
         if use_dgaps:
             docids = restore_from_dgaps(docids)
