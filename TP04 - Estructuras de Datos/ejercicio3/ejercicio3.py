@@ -23,9 +23,20 @@ def main():
         "--corpus-path", required=True, help="Directorio raíz de los documentos."
     )
     parser.add_argument("--queries-file", required=True, help="Archivo de queries.")
+    parser.add_argument(
+        "--stopwords", default=None, help="Archivo de stopwords (opcional, por defecto usa ../ejercicio3/stopwords.txt)"
+    )
     args = parser.parse_args()
 
-    tokenizer = Tokenizador()
+    # Determinar ruta de stopwords (solo si se pasa el argumento)
+    stopwords_path = args.stopwords
+    if stopwords_path:
+        print(f"[INFO] Usando stopwords de: {stopwords_path}")
+    else:
+        print("[INFO] No se usan stopwords.")
+
+    # Pasar la ruta al tokenizador (None si no se usa stopwords)
+    tokenizer = Tokenizador(stopwords_path=stopwords_path)
     indexador = IndexadorBSBI(tokenizer)
     irsys = IRSystemBSBI(indexador)
     irsys.index_collection(args.corpus_path)
@@ -90,6 +101,42 @@ def main():
 
     print_summary(results_2, 2)
     print_summary(results_3, 3)
+
+    # --- Análisis de relación tamaño de listas vs tiempo ---
+    import matplotlib.pyplot as plt
+    all_results = results_2 + results_3
+    postings_sizes = []
+    tiempos = []
+    for q, nres, t in all_results:
+        terms = tokenizer.tokenizar(q)
+        # Suma de tamaños de las listas de postings de la query
+        sizes = [len(irsys.get_term_from_posting_list(term)) for term in terms]
+        postings_sizes.append(sum(sizes))
+        tiempos.append(t)
+    if postings_sizes and tiempos:
+        plt.scatter(postings_sizes, tiempos, alpha=0.3)
+        plt.xlabel("Suma de tamaños de listas de postings en la query")
+        plt.ylabel("Tiempo de ejecución (s)")
+        plt.title("Relación entre tamaño de listas de postings y tiempo de ejecución")
+        plt.tight_layout()
+        plt.savefig("relacion_tamanio_tiempo.png")
+        plt.close()
+        print("[INFO] Gráfico guardado en relacion_tamanio_tiempo.png")
+        # Mostrar promedios por bins
+        import numpy as np
+        bins = np.histogram_bin_edges(postings_sizes, bins=10)
+        bin_times = [[] for _ in range(len(bins)-1)]
+        for size, t in zip(postings_sizes, tiempos):
+            for i in range(len(bins)-1):
+                if bins[i] <= size < bins[i+1] or (i == len(bins)-2 and size == bins[-1]):
+                    bin_times[i].append(t)
+                    break
+        print("\nPromedio de tiempos por rango de suma de tamaños de postings:")
+        for i in range(len(bins)-1):
+            left = int(bins[i])
+            right = int(bins[i+1])-1 if i < len(bins)-2 else int(bins[i+1])
+            avg = sum(bin_times[i])/len(bin_times[i]) if bin_times[i] else 0
+            print(f"[{left:>7}, {right:>7}]: {len(bin_times[i]):>6} queries, tiempo promedio={avg:.6f}s")
 
 
 if __name__ == "__main__":
