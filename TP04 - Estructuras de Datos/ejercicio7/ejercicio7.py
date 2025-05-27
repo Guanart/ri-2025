@@ -10,6 +10,7 @@ from lib.codecs_compresion import (
     elias_gamma_encode_list,
     compute_dgaps,
 )
+import matplotlib.pyplot as plt
 
 
 def comprimir_postings(corpus_path, index_compressed_dir=None):
@@ -91,6 +92,7 @@ def comprimir_postings(corpus_path, index_compressed_dir=None):
         else 0
     )
     print(f"Ahorro de espacio usando DGaps: {ahorro:.2f}%")
+    graficar_histogramas(resultados, tiempos_descomp)
 
 
 def descomprimir_postings(index_compressed_dir, vocab, use_dgaps):
@@ -137,6 +139,55 @@ def descomprimir_postings(index_compressed_dir, vocab, use_dgaps):
         f"Descompresión {'con' if use_dgaps else 'sin'} DGaps terminada. Tiempo total: {t1 - t0:.2f} s"
     )
     return t1 - t0, ok
+
+
+def graficar_histogramas(resultados, tiempos_descomp):
+    labels = [
+        "DocIDs sin DGaps",
+        "Freqs sin DGaps",
+        "DocIDs con DGaps",
+        "Freqs con DGaps"
+    ]
+    tamanios = [
+        resultados[0]["docids_total"],
+        resultados[0]["freqs_total"],
+        resultados[1]["docids_total"],
+        resultados[1]["freqs_total"]
+    ]
+    tiempos_comp = [
+        resultados[0]["tiempo"],
+        resultados[0]["tiempo"],
+        resultados[1]["tiempo"],
+        resultados[1]["tiempo"]
+    ]
+    tiempos_desc = [
+        tiempos_descomp[0],
+        tiempos_descomp[0],
+        tiempos_descomp[1],
+        tiempos_descomp[1]
+    ]
+    x = range(len(labels))
+    plt.figure(figsize=(10,5))
+    plt.bar(x, tamanios, color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'])
+    plt.xticks(x, labels, rotation=20)
+    plt.ylabel("Tamaño (bytes)")
+    plt.title("Tamaño comprimido de DocIDs y Frecuencias (con/sin DGaps)")
+    plt.tight_layout()
+    plt.savefig("hist_tamanio_postings.png")
+    plt.figure(figsize=(10,5))
+    plt.bar(x, tiempos_comp, color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'])
+    plt.xticks(x, labels, rotation=20)
+    plt.ylabel("Tiempo de compresión (s)")
+    plt.title("Tiempo de compresión de DocIDs y Frecuencias (con/sin DGaps)")
+    plt.tight_layout()
+    plt.savefig("hist_tiempo_compresion.png")
+    plt.figure(figsize=(10,5))
+    plt.bar(x, tiempos_desc, color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'])
+    plt.xticks(x, labels, rotation=20)
+    plt.ylabel("Tiempo de descompresión (s)")
+    plt.title("Tiempo de descompresión de DocIDs y Frecuencias (con/sin DGaps)")
+    plt.tight_layout()
+    plt.savefig("hist_tiempo_descompresion.png")
 
 
 if __name__ == "__main__":
