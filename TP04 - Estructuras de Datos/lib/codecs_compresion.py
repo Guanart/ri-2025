@@ -108,17 +108,16 @@ def elias_gamma_decode_list(ba: bitarray) -> list[int]:
             i += 1
         if i >= n:
             break  # Si llegamos al final, salimos
-        i += 1  # Saltar el 1
-        # Leer binario de unary_len bits
-        b = 0b10
-        # si k=17, entonces unary_len = 4
+        i += 1  # Saltar el 1 (el bit separador)
+        # Leer binario de unary_len bits (el offset)
+        b = 0  # Inicializamos el offset en 0
         for shift in reversed(range(unary_len)):
-            # primera iteracion: shift=3, b=0b0000
+            # Recorremos los bits del offset de mayor a menor peso
             if i < n and ba[i]:
-                b |= 1 << shift # Desplaza 1 a la izquierda 'shift' veces y lo agrega a b
-                # primera iteracion: b=0b1000
+                b |= 1 << shift  # Si el bit está en 1, lo sumamos en la posición correspondiente
             i += 1
-        val = (1 << unary_len) + b  # Reconstruir el número original (le concatena el 1 mas significativo a izquierda)
+        # El número original es el 1 más significativo seguido del offset
+        val = (1 << unary_len) | b  # Usamos OR para concatenar el 1 y el offset
         nums.append(val)
     return nums
 
