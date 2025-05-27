@@ -4,8 +4,12 @@ from lib.IndexadorBSBI import IndexadorBSBI
 from lib.IRSystemBSBI import IRSystemBSBI
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Muestra la posting list y skip list del término con posting list más corta.")
-    parser.add_argument("--index-path", required=True, help="Directorio raíz del índice BSBI.")
+    parser = argparse.ArgumentParser(
+        description="Muestra la posting list y skip list del término con posting list más corta."
+    )
+    parser.add_argument(
+        "--index-path", required=True, help="Directorio raíz del índice BSBI."
+    )
     args = parser.parse_args()
 
     tokenizer = Tokenizador()
@@ -15,11 +19,11 @@ if __name__ == "__main__":
 
     # Buscar un término con posting list entre 50 y 100 items (50 <= df <= 100)
     min_term = None
-    min_df = float('inf')
+    min_df = float("inf")
     for term, info in vocab.items():
-        if 50 <= info['df'] <= 100 and info['df'] < min_df:
+        if 50 <= info["df"] <= 100 and info["df"] < min_df:
             min_term = term
-            min_df = info['df']
+            min_df = info["df"]
 
     if not min_term:
         print("No se encontró término con posting list.")

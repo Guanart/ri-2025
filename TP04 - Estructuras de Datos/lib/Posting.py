@@ -15,7 +15,9 @@ class Posting:
 
     STRUCT_FORMAT = "II"  # 2 unsigned ints
     SIZE = 8  # 2 * 4 bytes
-    doc_id_map: Optional[Dict[int, str]] = None  # Mapping global para doc_id -> doc_name
+    doc_id_map: Optional[Dict[int, str]] = (
+        None  # Mapping global para doc_id -> doc_name
+    )
 
     def __init__(self, doc_id: int, freq: int):
         self.doc_id: int = doc_id

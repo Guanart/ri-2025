@@ -4,8 +4,13 @@ from bitarray import bitarray
 from lib.IRSystemBSBI import IRSystemBSBI
 from lib.IndexadorBSBI import IndexadorBSBI
 from lib.Tokenizador import Tokenizador
-from lib.codecs_compresion import vbyte_decode_list, elias_gamma_decode_list, restore_from_dgaps
+from lib.codecs_compresion import (
+    vbyte_decode_list,
+    elias_gamma_decode_list,
+    restore_from_dgaps,
+)
 import struct
+
 
 def mostrar_posting_comprimida(index_dir, termino, use_dgaps):
     tokenizer = Tokenizador()
@@ -27,7 +32,7 @@ def mostrar_posting_comprimida(index_dir, termino, use_dgaps):
     with open(docids_path, "rb") as f:
         vbyte = f.read()
     with open(freqs_path, "rb") as f:
-        n_freqs = struct.unpack('I', f.read(4))[0]
+        n_freqs = struct.unpack("I", f.read(4))[0]
         eg_bytes = f.read()
         egamma = bitarray()
         egamma.frombytes(eg_bytes)
@@ -38,8 +43,12 @@ def mostrar_posting_comprimida(index_dir, termino, use_dgaps):
     freqs = freqs_decoded_full[:n_freqs]
     print(f"\n[DEBUG] n_freqs leído del archivo: {n_freqs}")
     print(f"[DEBUG] Cantidad de docids decodificados: {len(docids)}")
-    print(f"[DEBUG] Cantidad de frecuencias decodificadas (crudo): {len(freqs_decoded_full)}")
-    print(f"[DEBUG] Primeros 10 valores decodificados crudos de Elias-gamma: {freqs_decoded_full[:10]}")
+    print(
+        f"[DEBUG] Cantidad de frecuencias decodificadas (crudo): {len(freqs_decoded_full)}"
+    )
+    print(
+        f"[DEBUG] Primeros 10 valores decodificados crudos de Elias-gamma: {freqs_decoded_full[:10]}"
+    )
     print(f"[DEBUG] Primeros 10 valores originales: {[p.freq for p in postings[:10]]}")
     print(f"\nPostings comprimidas (decodificadas) para '{termino}':")
     for d, f in zip(docids, freqs):
@@ -58,10 +67,15 @@ def mostrar_posting_comprimida(index_dir, termino, use_dgaps):
     else:
         print("\n¿La posting comprimida-descomprimida coincide con la original? NO")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Ejercicio 7.1: Mostrar posting list comprimida y original para un término.")
+    parser = argparse.ArgumentParser(
+        description="Ejercicio 7.1: Mostrar posting list comprimida y original para un término."
+    )
     parser.add_argument("--index-dir", required=True, help="Directorio del índice")
     parser.add_argument("--termino", required=True, help="Término a consultar")
-    parser.add_argument("--dgaps", action="store_true", help="Usar DGaps para decodificar docIDs")
+    parser.add_argument(
+        "--dgaps", action="store_true", help="Usar DGaps para decodificar docIDs"
+    )
     args = parser.parse_args()
     mostrar_posting_comprimida(args.index_dir, args.termino, args.dgaps)

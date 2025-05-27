@@ -4,17 +4,24 @@ from lib.Tokenizador import Tokenizador
 from lib.IRSystemBSBI import IRSystemBSBI
 from lib.IndexadorBSBI import IndexadorBSBI
 
+
 def load_queries(filepath):
     with open(filepath, "r", encoding="utf8") as f:
         # Si la línea tiene ":", devolver solo la parte después de ":"
         return [
             line.split(":", 1)[1].strip() if ":" in line else line.strip()
-            for line in f if line.strip()
+            for line in f
+            if line.strip()
         ]
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Evalúa queries booleanas TAAT y mide tiempos.")
-    parser.add_argument("--corpus-path", required=True, help="Directorio raíz de los documentos.")
+    parser = argparse.ArgumentParser(
+        description="Evalúa queries booleanas TAAT y mide tiempos."
+    )
+    parser.add_argument(
+        "--corpus-path", required=True, help="Directorio raíz de los documentos."
+    )
     parser.add_argument("--queries-file", required=True, help="Archivo de queries.")
     args = parser.parse_args()
 
@@ -48,7 +55,7 @@ def main():
                     t0 = time.time()
                     res = irsys.taat_query(query_str)
                     t1 = time.time()
-                    results_2.append((query_str, len(res), t1-t0))
+                    results_2.append((query_str, len(res), t1 - t0))
                 except Exception as e:
                     print(f"Query inválida o no parseable: '{query_str}' ({e})")
         elif len(terms) == 3 and all(t in vocabulary for t in terms):
@@ -58,7 +65,7 @@ def main():
                     t0 = time.time()
                     res = irsys.taat_query(query_str)
                     t1 = time.time()
-                    results_3.append((query_str, len(res), t1-t0))
+                    results_3.append((query_str, len(res), t1 - t0))
                 except Exception as e:
                     print(f"Query inválida o no parseable: '{query_str}' ({e})")
 
@@ -83,6 +90,7 @@ def main():
 
     print_summary(results_2, 2)
     print_summary(results_3, 3)
+
 
 if __name__ == "__main__":
     main()

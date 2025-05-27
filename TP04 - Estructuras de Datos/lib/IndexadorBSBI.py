@@ -97,7 +97,9 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             current_chunk_postings = []
 
         t_index_end = time.time()
-        print(f"\nTiempo de indexado (volcado parcial): {t_index_end - t_index_start:.2f} segundos")
+        print(
+            f"\nTiempo de indexado (volcado parcial): {t_index_end - t_index_start:.2f} segundos"
+        )
 
         print("Iniciando merge de chunks...")
         t_merge_start = time.time()
@@ -148,7 +150,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         df = len(posting_list)
         if df == 0:
             return []
-        k = int(df ** 0.5)
+        k = int(df**0.5)
         if k == 0:
             return []
         skips = []
@@ -170,9 +172,11 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             pp = chunk.get_current()
             if pp is not None:
                 heapq.heappush(heap, (pp.term_id, pp.doc_id, chunk_id, pp))
-                
+
         skips_dict: dict[str, list[tuple[int, int]]] = {}
-        with open(self.path_index + f"/{self.POSTINGS_FILENAME}", "wb") as final_index_file:
+        with open(
+            self.path_index + f"/{self.POSTINGS_FILENAME}", "wb"
+        ) as final_index_file:
             offset = 0
             current_term_id = None
             current_posting_list: list[Posting] = []
@@ -182,7 +186,14 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                 if current_term_id is None:
                     current_term_id = term_id
                 if term_id != current_term_id:
-                    self._write_posting_and_skips(final_index_file, current_term_id, current_posting_list, current_posting_offsets, offset, skips_dict)
+                    self._write_posting_and_skips(
+                        final_index_file,
+                        current_term_id,
+                        current_posting_list,
+                        current_posting_offsets,
+                        offset,
+                        skips_dict,
+                    )
                     offset += self.POSTING_SIZE * len(current_posting_list)
                     current_term_id = term_id
                     current_posting_list = []
@@ -192,15 +203,32 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                 chunk.next()
                 next_pp = chunk.get_current()
                 if next_pp is not None:
-                    heapq.heappush(heap, (next_pp.term_id, next_pp.doc_id, chunk_id, next_pp))
+                    heapq.heappush(
+                        heap, (next_pp.term_id, next_pp.doc_id, chunk_id, next_pp)
+                    )
             else:
                 if current_posting_list and current_term_id is not None:
-                    self._write_posting_and_skips(final_index_file, current_term_id, current_posting_list, current_posting_offsets, offset, skips_dict)
+                    self._write_posting_and_skips(
+                        final_index_file,
+                        current_term_id,
+                        current_posting_list,
+                        current_posting_offsets,
+                        offset,
+                        skips_dict,
+                    )
         self._write_skip_lists(skips_dict)
         for chunk in chunk_objs:
             chunk.close()
 
-    def _write_posting_and_skips(self, final_index_file, term_id, posting_list: list[Posting], posting_offsets: list[int], offset: int, skips_dict: dict[str, list[tuple[int, int]]]):
+    def _write_posting_and_skips(
+        self,
+        final_index_file,
+        term_id,
+        posting_list: list[Posting],
+        posting_offsets: list[int],
+        offset: int,
+        skips_dict: dict[str, list[tuple[int, int]]],
+    ):
         """
         Escribe la posting list y actualiza el vocabulario y skips_dict para el término dado.
         posting_offsets se llena correctamente con el offset en bytes de cada posting.
@@ -256,12 +284,10 @@ class IndexadorBSBI(CollectionAnalyzerBase):
             with open(skips_path, "rb") as f:
                 self.skips = pickle.load(f)
 
-
     def get_skips(self) -> dict:
         if not hasattr(self, "skips") or self.skips is None:
             self._load_skips()
         return self.skips if hasattr(self, "skips") else {}
-    
 
     def index_size_on_disk(self) -> Dict[str, int]:
         """
@@ -269,7 +295,9 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         """
         postings_path = os.path.join(self.path_index, self.POSTINGS_FILENAME)
         vocab_path = os.path.join(self.path_index, self.VOCABULARY_FILENAME)
-        size_postings = os.path.getsize(postings_path) if os.path.exists(postings_path) else 0
+        size_postings = (
+            os.path.getsize(postings_path) if os.path.exists(postings_path) else 0
+        )
         size_vocab = os.path.getsize(vocab_path) if os.path.exists(vocab_path) else 0
         return {
             "size_postings": size_postings,

@@ -14,7 +14,9 @@ def vbyte_encode_number(n: int) -> bytes:
     """
     bytes_list = []
     while True:
-        byte = n & 0b01111111  # Toma los 7 bits menos significativos de n  -> operador AND "&"
+        byte = (
+            n & 0b01111111
+        )  # Toma los 7 bits menos significativos de n  -> operador AND "&"
         n >>= 7  # Desplaza n 7 bits a la derecha (elimina los 7 bits ya codificados)
         if n:
             bytes_list.append(byte)  # MSB=0 (no es el último byte)
@@ -59,13 +61,14 @@ def vbyte_decode_list(data: bytes) -> list[int]:
 
 # -------------------- Elias-gamma --------------------
 
+
 def elias_gamma_encode_number(n: int) -> bitarray:
     """
     Codifica un entero n >= 1 en Elias-gamma (bitarray).
     """
     if n <= 0:
         raise ValueError("Elias-gamma solo para n >= 1")
-    bin_len = int(math.log2(n)) # redondea hacia abajo (numero base de la diapositiva)
+    bin_len = int(math.log2(n))  # redondea hacia abajo (numero base de la diapositiva)
     offset = n - 2**bin_len  # offset   # si k=17, entonces offset = 1
     ba = bitarray()
     # Unario: bin_len ceros y un 1
@@ -76,8 +79,11 @@ def elias_gamma_encode_number(n: int) -> bitarray:
     for i in reversed(range(bin_len)):
         # si k=17, entonces offset = 1 = 0b0001
         # Extrae el bit en la posición 'i' de 'offset' y lo agrega a 'ba'
-        ba.append((offset >> i) & 0b00000001) # Desplaza los bits de offset a la derecha i posiciones, y enmascara con 1 para obtener el bit menos significativo, para agregar los bits de mayor a menor peso
+        ba.append(
+            (offset >> i) & 0b00000001
+        )  # Desplaza los bits de offset a la derecha i posiciones, y enmascara con 1 para obtener el bit menos significativo, para agregar los bits de mayor a menor peso
     return ba
+
 
 def elias_gamma_encode_list(nums: list[int]) -> bytes:
     """
@@ -114,7 +120,9 @@ def elias_gamma_decode_list(ba: bitarray) -> list[int]:
         for shift in reversed(range(unary_len)):
             # Recorremos los bits del offset de mayor a menor peso
             if i < n and ba[i]:
-                b |= 1 << shift  # Si el bit está en 1, lo sumamos en la posición correspondiente
+                b |= (
+                    1 << shift
+                )  # Si el bit está en 1, lo sumamos en la posición correspondiente
             i += 1
         # El número original es el 1 más significativo seguido del offset
         val = (1 << unary_len) | b  # Usamos OR para concatenar el 1 y el offset
@@ -151,6 +159,7 @@ def restore_from_dgaps(dgaps: list[int]) -> list[int]:
     for d in dgaps[1:]:
         nums.append(nums[-1] + d)
     return nums
+
 
 if __name__ == "__main__":
     # Test unitario de Elias-gamma

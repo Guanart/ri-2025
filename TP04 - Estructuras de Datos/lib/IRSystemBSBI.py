@@ -15,10 +15,11 @@ class IRSystemBSBI(IRSystem):
     Sistema de recuperación para índice BSBI persistido en disco.
     Permite cargar el vocabulario y recuperar posting lists de manera sencilla.
     """
+
     # analyzer: IndexadorBSBI
     def __init__(self, analyzer: IndexadorBSBI):
         super().__init__(analyzer)
-        self.analyzer: IndexadorBSBI = analyzer # type: ignore
+        self.analyzer: IndexadorBSBI = analyzer  # type: ignore
         self.index_dir = analyzer.path_index
         # Setear el doc_id_map global en Posting para que cada Posting pueda resolver su doc_name
         Posting.set_doc_id_map(analyzer.doc_id_map)
@@ -31,13 +32,14 @@ class IRSystemBSBI(IRSystem):
         if self.analyzer.get_vocabulary() is not None:
             self._make_term_index()
 
-
     def _make_term_index(self) -> None:
         """
         Mapear términos a índices de vector
         """
         for i, term in enumerate(self.analyzer.get_vocabulary().keys()):
-            self.term_index[term] = i  # Guarda el índice numérico que ocupará ese término en los vectores
+            self.term_index[term] = (
+                i  # Guarda el índice numérico que ocupará ese término en los vectores
+            )
             # En el espacio vectorial, cada documento (y cada consulta) se representa con un vector de longitud V (tamaño del vocabulario). Para saber en qué posición del vector colocar el peso de un cada término, necesitamos un mapeo término→índice único.
 
     def _make_vector(self, tf_counter: Counter) -> np.ndarray:
@@ -98,9 +100,7 @@ class IRSystemBSBI(IRSystem):
         # 4) Calcula el score para cada documento candidato
         heap: list[tuple[float, int, str]] = []
         for docid in candidate_docids:
-            tf_doc = self.analyzer.get_doc_terms(
-                docid
-            )
+            tf_doc = self.analyzer.get_doc_terms(docid)
             d_vec = self._make_vector(tf_doc)
             norm_d = np.linalg.norm(d_vec)
             if norm_d == 0:
@@ -120,7 +120,7 @@ class IRSystemBSBI(IRSystem):
         # 6) Ordenar los k resultados y devolver [(docname, docid, score), ...]
         heap.sort(key=lambda x: -x[0])
         return [(docname, docid, score) for score, docid, docname in heap]
-    
+
     def taat_query(self, query: str) -> list[tuple[int, str]]:
         """
         Evalúa una consulta booleana TAAT (Term At A Time) y devuelve los documentos que la satisfacen.
@@ -183,8 +183,12 @@ class IRSystemBSBI(IRSystem):
         Solo soporta queries AND de varios términos (no OR/NOT).
         """
         import re
+
         # Extraer términos (solo AND, sin paréntesis ni OR/NOT)
-        terms = [t.strip() for t in re.split(r"\s+AND\s+", query.strip(), flags=re.IGNORECASE)]
+        terms = [
+            t.strip()
+            for t in re.split(r"\s+AND\s+", query.strip(), flags=re.IGNORECASE)
+        ]
         if len(terms) < 2:
             raise ValueError("La consulta debe tener al menos dos términos AND.")
 
@@ -220,13 +224,17 @@ class IRSystemBSBI(IRSystem):
                     ptr += posting_size
             return docids
 
-        result_docids = get_posting_docids(ordered_terms[0])    # Lista de resultados parciales -> es inicializa con los doc_id del termino con menor df (posting list mas corta)
+        result_docids = get_posting_docids(
+            ordered_terms[0]
+        )  # Lista de resultados parciales -> es inicializa con los doc_id del termino con menor df (posting list mas corta)
 
-        for idx in range(1, len(ordered_terms)):    # No incluye el primer término
+        for idx in range(1, len(ordered_terms)):  # No incluye el primer término
             # Recuperar info para recuperar posting list de t
             t = ordered_terms[idx]
             info = vocabulary[t]
-            skips = SkipList(skips_dict.get(t, []))  # skips de la segunda posting list mas corta
+            skips = SkipList(
+                skips_dict.get(t, [])
+            )  # skips de la segunda posting list mas corta
             ptr = info["puntero"]
             end = ptr + info["df"] * posting_size
 

@@ -75,7 +75,9 @@ class Tokenizador:
         texto = self.url_pattern.sub(" ", texto)
         texto = self.email_pattern.sub(" ", texto)
         # Extraer palabras y números
-        tokens: list[str] = re.findall(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñçàèìòùâêîôûäëïöü0-9]+", texto)
+        tokens: list[str] = re.findall(
+            r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñçàèìòùâêîôûäëïöü0-9]+", texto
+        )
         # Normalizar
         tokens = [t.lower() for t in tokens if t.strip()]
         # Filtrar longitud

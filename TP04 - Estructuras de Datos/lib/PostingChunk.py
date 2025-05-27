@@ -14,7 +14,11 @@ class PostingChunk:
         next(), reset(), merge_with(), read/write en binario
     """
 
-    def __init__(self, partial_postings: Optional[list[PartialPosting]] = None, file_path: Optional[str] = None):
+    def __init__(
+        self,
+        partial_postings: Optional[list[PartialPosting]] = None,
+        file_path: Optional[str] = None,
+    ):
         """
         Si partial_postings es provisto, se usa para escritura (guardar el chunk en disco).
         Si solo se provee file_path, se usa para lectura secuencial (merge multi-way).

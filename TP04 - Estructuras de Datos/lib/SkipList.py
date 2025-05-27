@@ -27,7 +27,8 @@ class SkipList:
             # and self.skips[self.idx][0] <= target_docid
             # and
             # Si el offset de la skip es mayor que el offset actual, devolvemos el offset (esto indica que podemos saltar a ese offset)
-            self.skips[self.idx][1] > current_offset
+            self.skips[self.idx][1]
+            > current_offset
         ):
             return self.skips[self.idx][1]
         return None

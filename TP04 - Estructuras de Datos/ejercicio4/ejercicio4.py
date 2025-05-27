@@ -3,6 +3,7 @@ from lib.Tokenizador import Tokenizador
 from lib.IndexadorBSBI import IndexadorBSBI
 from lib.IRSystemBSBI import IRSystemBSBI
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Procesa consultas vectoriales sobre el índice TF-IDF."
@@ -39,7 +40,9 @@ def main():
     irsys = IRSystemBSBI(analyzer)
     irsys.index_collection(args.corpus_path)
 
-    resultados: list[tuple[str, int, float]] = irsys.daat_query(args.query, top_k=args.top_k)
+    resultados: list[tuple[str, int, float]] = irsys.daat_query(
+        args.query, top_k=args.top_k
+    )
 
     if not resultados:
         print("No se encontraron documentos para la consulta.")
@@ -47,6 +50,7 @@ def main():
     print(f"Resultados para la consulta '{args.query}':")
     for docname, docid, score in resultados:
         print(f"{docname}:{docid}:{score:.4f}")
+
 
 if __name__ == "__main__":
     main()
