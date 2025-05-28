@@ -99,6 +99,27 @@ def main():
     print_summary(results_skips_2, "TAAT con skips - AND 2 términos")
     print_summary(results_skips_3, "TAAT con skips - AND 3 términos")
 
+    # === Análisis comparativo de tiempos ===
+    import numpy as np
+
+    def resumen_tiempos(resultados):
+        tiempos = [t for _, _, t in resultados]
+        if not tiempos:
+            return 0, 0, 0
+        return np.mean(tiempos), np.median(tiempos), np.std(tiempos)
+
+    print("\nResumen comparativo de tiempos (en segundos):")
+    print("{:<35} {:>12} {:>12} {:>12}".format("Método", "Promedio", "Mediana", "Std"))
+    print("-" * 75)
+    for nombre, res in [
+        ("TAAT clásico - AND 2 términos", results_taat_2),
+        ("TAAT con skips - AND 2 términos", results_skips_2),
+        ("TAAT clásico - AND 3 términos", results_taat_3),
+        ("TAAT con skips - AND 3 términos", results_skips_3),
+    ]:
+        prom, med, std = resumen_tiempos(res)
+        print(f"{nombre:<35} {prom:12.6f} {med:12.6f} {std:12.6f}")
+
 
 if __name__ == "__main__":
     main()

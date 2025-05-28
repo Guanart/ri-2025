@@ -93,41 +93,9 @@ def analyze_by_length(results_taat, results_daat):
                 f"Query len={qlen}: {len(times)} queries, tiempo promedio={sum(times) / len(times):.6f}s"
             )
 
-    def print_posting_stats(results, label):
-        print(
-            f"\n{'=' * 10} Análisis por longitud de posting list [{label}] {'=' * 10}"
-        )
-        by_post_len = defaultdict(list)
-        for q, nres, t, qlen, postlens in results:
-            for plen in postlens:
-                by_post_len[plen].append(t)
-        freq = sorted(by_post_len.items(), key=lambda x: -len(x[1]))
-        shown = set()
-        for plen, times in freq[:10]:
-            print(
-                f"Posting len={plen}: {len(times)} apariciones, tiempo promedio={sum(times) / len(times):.6f}s"
-            )
-            shown.add(plen)
-        if by_post_len:
-            min_plen = min(by_post_len)
-            max_plen = max(by_post_len)
-            if min_plen not in shown:
-                times = by_post_len[min_plen]
-                print(
-                    f"Posting len={min_plen}: {len(times)} apariciones, tiempo promedio={sum(times) / len(times):.6f}s (mínimo)"
-                )
-            if max_plen not in shown:
-                times = by_post_len[max_plen]
-                print(
-                    f"Posting len={max_plen}: {len(times)} apariciones, tiempo promedio={sum(times) / len(times):.6f}s (máximo)"
-                )
-
     # Mostrar análisis por longitud de query y posting list
     print_query_stats(results_taat, "TAAT")
     print_query_stats(results_daat, "DAAT")
-    print_posting_stats(
-        results_taat, "TAAT"
-    )  # Solo una vez, posting list es igual para ambos
 
     # Binning de longitudes de posting list para promedios de tiempo
     all_postlens = []

@@ -24,7 +24,9 @@ def main():
     )
     parser.add_argument("--queries-file", required=True, help="Archivo de queries.")
     parser.add_argument(
-        "--stopwords", default=None, help="Archivo de stopwords (opcional, por defecto usa ../ejercicio3/stopwords.txt)"
+        "--stopwords",
+        default=None,
+        help="Archivo de stopwords (opcional, por defecto usa ../ejercicio3/stopwords.txt)",
     )
     args = parser.parse_args()
 
@@ -104,6 +106,7 @@ def main():
 
     # --- Análisis de relación tamaño de listas vs tiempo ---
     import matplotlib.pyplot as plt
+
     all_results = results_2 + results_3
     postings_sizes = []
     tiempos = []
@@ -124,19 +127,24 @@ def main():
         print("[INFO] Gráfico guardado en relacion_tamanio_tiempo.png")
         # Mostrar promedios por bins
         import numpy as np
+
         bins = np.histogram_bin_edges(postings_sizes, bins=10)
-        bin_times = [[] for _ in range(len(bins)-1)]
+        bin_times = [[] for _ in range(len(bins) - 1)]
         for size, t in zip(postings_sizes, tiempos):
-            for i in range(len(bins)-1):
-                if bins[i] <= size < bins[i+1] or (i == len(bins)-2 and size == bins[-1]):
+            for i in range(len(bins) - 1):
+                if bins[i] <= size < bins[i + 1] or (
+                    i == len(bins) - 2 and size == bins[-1]
+                ):
                     bin_times[i].append(t)
                     break
         print("\nPromedio de tiempos por rango de suma de tamaños de postings:")
-        for i in range(len(bins)-1):
+        for i in range(len(bins) - 1):
             left = int(bins[i])
-            right = int(bins[i+1])-1 if i < len(bins)-2 else int(bins[i+1])
-            avg = sum(bin_times[i])/len(bin_times[i]) if bin_times[i] else 0
-            print(f"[{left:>7}, {right:>7}]: {len(bin_times[i]):>6} queries, tiempo promedio={avg:.6f}s")
+            right = int(bins[i + 1]) - 1 if i < len(bins) - 2 else int(bins[i + 1])
+            avg = sum(bin_times[i]) / len(bin_times[i]) if bin_times[i] else 0
+            print(
+                f"[{left:>7}, {right:>7}]: {len(bin_times[i]):>6} queries, tiempo promedio={avg:.6f}s"
+            )
 
 
 if __name__ == "__main__":
