@@ -22,7 +22,7 @@ class IRSystemBSBI(IRSystem):
         self.analyzer: IndexadorBSBI = analyzer  # type: ignore
         self.index_dir = analyzer.path_index
         # Setear el doc_id_map global en Posting para que cada Posting pueda resolver su doc_name
-        Posting.set_doc_id_map(analyzer.doc_id_map)
+        Posting.set_doc_id_map(analyzer.get_doc_id_map())
 
         # Para el modelo vectorial:
         self.term_index: dict[str, int] = {}
@@ -107,7 +107,7 @@ class IRSystemBSBI(IRSystem):
                 continue
 
             score = float(np.dot(q_vec, d_vec) / (norm_q * norm_d))
-            docname = self.analyzer.doc_id_map.get(docid, str(docid))
+            docname = self.analyzer.get_doc_id_map().get(docid, str(docid))
 
             # 5) Modificar Top-k
             if len(heap) < top_k:

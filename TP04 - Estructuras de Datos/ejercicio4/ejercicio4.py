@@ -36,7 +36,7 @@ def main():
     args = parser.parse_args()
 
     tokenizer = Tokenizador(stopwords_path=args.path_stopwords)
-    analyzer = IndexadorBSBI(tokenizer, precalc_doc_vectors=True)
+    analyzer = IndexadorBSBI(tokenizer)
     irsys = IRSystemBSBI(analyzer)
     irsys.index_collection(args.corpus_path)
 

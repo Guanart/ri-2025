@@ -30,7 +30,6 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         tokenizer: Tokenizador,
         memory_limit: int = 1000,
         path_index: str = "index",
-        precalc_doc_vectors: bool = False,
     ):
         super().__init__(tokenizer)
         self.memory_limit: int = memory_limit
@@ -43,8 +42,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         self.term2id: Dict[str, int] = {}
         self.id2term: Dict[int, str] = {}
         self.doc_id_map: Dict[int, str] = {}  # doc_id -> nombre del archivo
-        self.precalc_doc_vectors = precalc_doc_vectors
-        self._doc_vectors: dict = {}
+        self._doc_vectors = None  # Siempre None al inicio, se carga si existe
 
     def index_collection(self, docs_path: str) -> None:
         """
@@ -88,8 +86,9 @@ class IndexadorBSBI(CollectionAnalyzerBase):
                         )
                     self.doc_id_map[doc_id] = doc_name
                     # --- GUARDAR VECTOR DEL DOCUMENTO ---
-                    if self.precalc_doc_vectors:
-                        self._doc_vectors[doc_id] = terms_freq.copy()
+                    if self._doc_vectors is None:
+                        self._doc_vectors = {}
+                    self._doc_vectors[doc_id] = terms_freq.copy()
 
         # Procesar el último chunk
         if len(current_chunk_postings) > 0:
@@ -109,7 +108,7 @@ class IndexadorBSBI(CollectionAnalyzerBase):
 
         self._write_vocabulary()
         self._write_metadata()
-        if self.precalc_doc_vectors:
+        if self._doc_vectors is not None:
             self._write_doc_vectors()
 
     def _process_doc(self, fname: str, root: str, path: str) -> tuple[list[str], str]:
@@ -361,10 +360,11 @@ class IndexadorBSBI(CollectionAnalyzerBase):
         Devuelve un Counter con los términos y frecuencias de un documento dado.
         Usa los vectores precalculados si están disponibles y activados.
         """
-        if self.precalc_doc_vectors:
-            self._load_doc_vectors()
+        self._load_doc_vectors()
+        if self._doc_vectors is not None:
             return self._doc_vectors.get(docid, Counter())
-        return Counter()
+        else:
+            return Counter()
 
     # ESTO LO PUSE POR LA ABSTRACT CLASS
 
