@@ -1,0 +1,18 @@
+1: push(todo_list, initial_set_of_urls)
+2: while todo_list[0] ≠ None do
+3: page = fetch_page(todo list [0])
+4: if page_downloaded then
+5: links = parse(page)
+6: for all l in links do
+7: if I in done_list then
+8: push(todo_list[0].outlinks.done_list[l].id)
+9: else if I in todo_list then
+10 push(todo_list[0].outlinks,todo_list[l].id)
+11: else if _should_add_link(l) then
+12: push(todo.list, l)
+13: todo list[l].id = nro_of_urls # el id que asignemos
+14: push(todo_list[0].outlinks, todo_list[l].id)
+15: end if
+16: end for
+17: end if
+18: end while

@@ -1,0 +1,61 @@
+from lib.Crawler import Crawler
+import json
+
+def main():
+    # Crawling de MercadoLibre con filtro de dominio
+    initial_urls = ["https://www.mercadolibre.com.ar"]
+    crawler = Crawler(
+        max_depth=3,
+        max_dir_depth=3,
+        max_pages_per_site=100,
+        domain_filter="mercadolibre.com.ar",
+        preserve_query=True,  # Preservar query params
+        max_total_pages=100
+    )
+
+    print("Iniciando crawling de MercadoLibre.com.ar...")
+    crawler.crawl(initial_urls)
+    
+    # Guardar estado
+    crawler.save_state("ejercicio3_mercadolibre_crawl.pkl")
+
+    # Obtener estadísticas
+    stats = crawler.get_statistics()
+
+    print("\n=== ANÁLISIS DE MERCADOLIBRE.COM.AR ===")
+    print(f"Total de páginas: {stats.get('total_pages', 0)}")
+    
+    total_pages = stats.get('total_pages', 0)
+    if total_pages > 0:
+        print(f"Páginas dinámicas: {stats.get('dynamic_pages', 0)} ({stats.get('dynamic_pages', 0)/total_pages*100:.1f}%)")
+        print(f"Páginas estáticas: {stats.get('static_pages', 0)} ({stats.get('static_pages', 0)/total_pages*100:.1f}%)")
+    else:
+        print("Páginas dinámicas: 0 (0.0%)")
+        print("Páginas estáticas: 0 (0.0%)")
+    
+    print(f"Páginas fallidas: {stats.get('failed_pages', 0)}")
+    
+    print("\nDistribución por profundidad lógica:")
+    depth_dist = stats.get('depth_distribution', {})
+    if depth_dist:
+        for depth, count in sorted(depth_dist.items()):
+            print(f"  Profundidad {depth}: {count} páginas")
+    else:
+        print("  No hay datos de distribución por profundidad")
+    
+    print("\nDistribución por profundidad física:")
+    dir_depth_dist = stats.get('dir_depth_distribution', {})
+    if dir_depth_dist:
+        for dir_depth, count in sorted(dir_depth_dist.items()):
+            print(f"  Directorio nivel {dir_depth}: {count} páginas")
+    else:
+        print("  No hay datos de distribución por directorio")
+    
+    # Guardar estadísticas en JSON
+    with open("mercadolibre_analysis.json", "w") as f:
+        json.dump(stats, f, indent=2)
+
+    print("\nEstadísticas guardadas en mercadolibre_analysis.json")
+
+if __name__ == "__main__":
+    main()
