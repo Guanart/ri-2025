@@ -1,63 +1,46 @@
-from lib.Crawler import Crawler
-from pyvis.network import Network
+import sys
 import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from lib.Crawler import Crawler
+from lib.CrawlerParallel import CrawlerParallel
 import time
 import plotly.graph_objects as go
 import networkx as nx
 
 
-def visualize_with_plotly(crawler, filename="crawler_plotly_graph.html", max_nodes=1000):
-    """
-    Genera una visualización interactiva eficiente usando Plotly y NetworkX.
-    Mucho más rápida que pyvis para grafos grandes.
-    """
-    print(f"Generando visualización con Plotly para {len(crawler.done_list)} nodos...")
+def create_simple_visualization(crawler, filename="crawler_graph.html"):
+    """Genera una visualización simple con Plotly"""
+    print(f"Generando visualización para {len(crawler.done_list)} nodos...")
     
     # Crear grafo NetworkX
     G = nx.DiGraph()
     
-    # Filtrar y seleccionar nodos válidos
-    valid_tasks = [task for task in crawler.done_list if task.id is not None]
+    # Usar todos los nodos - sin limitaciones
+    tasks_to_show = crawler.done_list
     
-    # Si hay demasiados nodos, tomar una muestra de los más importantes
-    if len(valid_tasks) > max_nodes:
-        print(f"Demasiados nodos ({len(valid_tasks)}), tomando muestra de los {max_nodes} más conectados...")
-        valid_tasks = sorted(valid_tasks, key=lambda t: len(t.outlinks), reverse=True)[:max_nodes]
-    
-    # Crear mapeo de IDs
-    id_to_index = {task.id: i for i, task in enumerate(valid_tasks)}
-    
-    # Agregar nodos al grafo
-    for i, task in enumerate(valid_tasks):
-        is_dynamic = crawler.is_dynamic_page(task.url)
-        color = 'red' if is_dynamic else 'lightblue'
-        G.add_node(i, 
-                  url=task.url, 
-                  domain=task.url.split('/')[2] if '://' in task.url else task.url,
-                  depth=task.depth,
-                  is_dynamic=is_dynamic,
-                  outlinks_count=len(task.outlinks),
-                  color=color)
+    # Agregar nodos
+    for i, task in enumerate(tasks_to_show):
+        if task.id is not None:
+            G.add_node(i, 
+                      url=task.url,
+                      depth=task.depth,
+                      is_dynamic=crawler.is_dynamic_page(task.url))
     
     # Agregar aristas
+    id_to_index = {task.id: i for i, task in enumerate(tasks_to_show) if task.id is not None}
     edges_added = 0
-    for i, task in enumerate(valid_tasks):
-        for out_id in task.outlinks:
-            if out_id in id_to_index:
-                target_idx = id_to_index[out_id]
-                G.add_edge(i, target_idx)
-                edges_added += 1
     
-    print(f"Grafo creado: {len(G.nodes())} nodos, {len(G.edges())} aristas")
+    for i, task in enumerate(tasks_to_show):
+        if task.id is not None:
+            for out_id in task.outlinks:
+                if out_id in id_to_index:
+                    target_idx = id_to_index[out_id]
+                    G.add_edge(i, target_idx)
+                    edges_added += 1
     
-    # Calcular layout usando algoritmo eficiente
-    print("Calculando layout del grafo...")
-    if len(G.nodes()) > 500:
-        # Para grafos grandes, usar layout más rápido
-        pos = nx.spring_layout(G, k=1.5, iterations=30, seed=42)
-    else:
-        # Para grafos pequeños, usar layout de mejor calidad
-        pos = nx.spring_layout(G, k=2, iterations=50, seed=42)
+    # Layout
+    pos = nx.spring_layout(G, k=2, iterations=50, seed=42)
     
     # Preparar datos para Plotly
     edge_x, edge_y = [], []
@@ -67,238 +50,207 @@ def visualize_with_plotly(crawler, filename="crawler_plotly_graph.html", max_nod
         edge_x.extend([x0, x1, None])
         edge_y.extend([y0, y1, None])
     
-    # Datos de nodos
     node_x = [pos[node][0] for node in G.nodes()]
     node_y = [pos[node][1] for node in G.nodes()]
-    node_colors = [G.nodes[node]['color'] for node in G.nodes()]
-    node_sizes = [min(15, 8 + G.nodes[node]['outlinks_count'] // 3) for node in G.nodes()]
+    node_colors = ['red' if G.nodes[node]['is_dynamic'] else 'lightblue' for node in G.nodes()]
     
-    # Crear texto de hover
-    hover_text = []
-    for node in G.nodes():
-        data = G.nodes[node]
-        text = f"<b>Dominio:</b> {data['domain']}<br>"
-        text += f"<b>Profundidad:</b> {data['depth']}<br>"
-        text += f"<b>Enlaces:</b> {data['outlinks_count']}<br>"
-        text += f"<b>Tipo:</b> {'Dinámico' if data['is_dynamic'] else 'Estático'}<br>"
-        text += f"<b>URL:</b> {data['url'][:80]}{'...' if len(data['url']) > 80 else ''}"
-        hover_text.append(text)
-    
-    # Crear figura de Plotly
+    # Crear figura
     fig = go.Figure()
     
-    # Agregar aristas
-    fig.add_trace(go.Scatter(
-        x=edge_x, y=edge_y,
-        mode='lines',
-        line=dict(width=0.5, color='#888'),
-        hoverinfo='none',
-        showlegend=False,
-        name='Enlaces'
-    ))
+    # Aristas
+    fig.add_trace(go.Scatter(x=edge_x, y=edge_y,
+                            line=dict(width=0.5, color='#888'),
+                            hoverinfo='none',
+                            mode='lines'))
     
-    # Agregar nodos
-    fig.add_trace(go.Scatter(
-        x=node_x, y=node_y,
-        mode='markers',
-        marker=dict(
-            size=node_sizes,
-            color=node_colors,
-            line=dict(width=1, color='white'),
-            opacity=0.8
-        ),
-        text=hover_text,
-        hoverinfo='text',
-        showlegend=False,
-        name='Páginas'
-    ))
+    # Nodos
+    fig.add_trace(go.Scatter(x=node_x, y=node_y,
+                            mode='markers',
+                            hoverinfo='text',
+                            text=[f"ID: {i}<br>Profundidad: {G.nodes[i]['depth']}<br>URL: {G.nodes[i]['url'][:50]}..." 
+                                  for i in G.nodes()],
+                            marker=dict(size=8,
+                                       color=node_colors,
+                                       line=dict(width=2))))
     
-    # Configurar layout
-    fig.update_layout(
-        title=dict(
-            text=f"Grafo de Crawling SECUENCIAL - {len(G.nodes())} páginas, {len(G.edges())} enlaces",
-            font=dict(size=16)
-        ),
-        showlegend=False,
-        hovermode='closest',
-        margin=dict(b=20, l=5, r=5, t=40),
-        annotations=[
-            dict(
-                text="Azul: Páginas estáticas | Rojo: Páginas dinámicas<br>Tamaño: Número de enlaces salientes",
-                showarrow=False,
-                xref="paper", yref="paper",
-                x=0.005, y=-0.002, xanchor='left', yanchor='bottom',
-                font=dict(size=12, color='#666')
-            )
-        ],
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        plot_bgcolor='white',
-        width=1200,
-        height=800
-    )
+    fig.update_layout(title=dict(text=f'Grafo del Crawler - {len(G.nodes())} nodos, {edges_added} aristas',
+                                font=dict(size=16)),
+                     showlegend=False,
+                     hovermode='closest',
+                     margin=dict(b=20,l=5,r=5,t=40),
+                     annotations=[ dict(
+                         text="Rojo: páginas dinámicas | Azul: páginas estáticas",
+                         showarrow=False,
+                         xref="paper", yref="paper",
+                         x=0.005, y=-0.002 ) ],
+                     xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                     yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
     
-    # Guardar archivo HTML
-    fig.write_html(filename, include_plotlyjs='cdn')
-    print(f"Visualización Plotly guardada: {filename}")
-    
-    return len(G.nodes()), len(G.edges())
+    fig.write_html(filename)
+    return len(G.nodes()), edges_added
 
 
 def main():
-    # 20 primeros sitios de Netcraft
+    # Elegir tipo de crawler
+    use_parallel = input("¿Usar crawler paralelo? (s/N): ").lower().strip() == 's'
+    
+    # Si es paralelo, configurar workers
+    if use_parallel:
+        while True:
+            try:
+                max_workers = int(input("¿Cuántos workers paralelos? (2-12): "))
+                if 2 <= max_workers <= 12:
+                    break
+                else:
+                    print("Por favor ingresa un número entre 2 y 12")
+            except ValueError:
+                print("Por favor ingresa un número válido")
+    else:
+        max_workers = 1  # No se usa en crawler secuencial, pero se define
+    
+    # Elegir si preservar query strings
+    preserve_query = input("\n¿Preservar query strings en las URLs? (s/N): ").lower().strip() == 's'
+    
+    # Elegir cantidad de páginas
+    print("\nOpciones de páginas:")
+    print("1. 50 páginas")
+    print("2. 150 páginas")
+    print("3. 500 páginas")
+    print("4. Personalizado")
+    
+    choice = input("Selecciona opción (1-4): ").strip()
+    
+    if choice == "1":
+        max_pages = 50
+    elif choice == "2":
+        max_pages = 150
+    elif choice == "3":
+        max_pages = 500
+    elif choice == "4":
+        while True:
+            try:
+                max_pages = int(input("Ingresa número de páginas (recomendado de 10 a 2000): "))
+                if 10 <= max_pages <= 10000:
+                    break
+                else:
+                    print("Por favor ingresa un número entre 10 y 10000")
+            except ValueError:
+                print("Por favor ingresa un número válido")
+    else:
+        print("Opción no válida, usando 150 páginas por defecto")
+        max_pages = 150
+    
+    # Elegir páginas por sitio
+    while True:
+        try:
+            pages_per_site = int(input("\n¿Cuántas páginas máximo por sitio/dominio? (20-50): "))
+            if 20 <= pages_per_site <= 50:
+                break
+            else:
+                print("Por favor ingresa un número entre 20 y 50")
+        except ValueError:
+            print("Por favor ingresa un número válido")
+    
+    # URLs semilla (top 20 Netcraft)
     initial_urls = [
-        "https://www.google.com",
-        "https://www.youtube.com",
-        "https://mail.google.com",
-        "https://outlook.office.com",
-        "https://www.facebook.com",
-        "https://docs.google.com",
-        "https://chatgpt.com",
-        "https://login.microsoftonline.com",
-        "https://www.linkedin.com",
-        "https://accounts.google.com",
-        "https://x.com",
-        "https://www.bing.com",
-        "https://www.instagram.com",
-        "https://drive.google.com",
-        "https://campus-1001.ammon.cloud",
-        "https://github.com",
-        "https://web.whatsapp.com",
-        "https://duckduckgo.com",
-        "https://www.reddit.com",
-        "https://calendar.google.com",
+        "https://www.google.com", "https://www.youtube.com", "https://mail.google.com",
+        "https://outlook.office.com", "https://www.facebook.com", "https://docs.google.com",
+        "https://chatgpt.com", "https://login.microsoftonline.com", "https://www.linkedin.com",
+        "https://accounts.google.com", "https://x.com", "https://www.bing.com",
+        "https://www.instagram.com", "https://drive.google.com", "https://github.com",
+        "https://web.whatsapp.com", "https://duckduckgo.com", "https://www.reddit.com",
+        "https://calendar.google.com", "https://www.wikipedia.org"
     ]
 
-    pkl_path = "crawler_sequential_test.pkl"
+    # Configurar archivos con nombres que incluyan la cantidad de páginas y preserve_query
+    pkl_suffix = "parallel" if use_parallel else "sequential"
+    query_suffix = "query" if preserve_query else "noquery"
+    pkl_path = f"ejercicio2_{pkl_suffix}_{max_pages}p_{query_suffix}.pkl"
+    html_filename = f"ejercicio2_{pkl_suffix}_{max_pages}p_{query_suffix}_graph.html"
 
-    # Si ya existe el archivo, cargar el estado, si no, hacer crawling
+    # Cargar estado existente o hacer crawling
     if os.path.exists(pkl_path):
-        print("Cargando estado guardado...")
-        crawler = Crawler.load_state(pkl_path)
+        print(f"Cargando estado guardado desde {pkl_path}...")
+        if use_parallel:
+            crawler = CrawlerParallel.load_state(pkl_path)
+        else:
+            crawler = Crawler.load_state(pkl_path)
         print(f"Estado cargado: {len(crawler.done_list)} páginas")
     else:
-        print("=== INICIANDO CRAWLING SECUENCIAL ===")
+        print(f"=== INICIANDO CRAWLING {'PARALELO' if use_parallel else 'SECUENCIAL'} ===")
+        print(f"Objetivo: {max_pages} páginas")
+        print(f"Páginas por sitio: {pages_per_site}")
+        print(f"Preservar query strings: {preserve_query}")
+        if use_parallel:
+            print(f"Workers paralelos: {max_workers}")
         start_time = time.time()
 
-        # Configuración para crawling secuencial
-        crawler = Crawler(
-            max_depth=2,  # Profundidad moderada
-            max_dir_depth=3,  # Permitir más profundidad física
-            max_pages_per_site=20,  # Más páginas por sitio
-            max_total_pages=1000,  # Límite total de páginas
-        )
+        # Configuración del crawler con parámetros configurables
+        if use_parallel:
+            crawler = CrawlerParallel(
+                max_depth=3,
+                max_dir_depth=3,
+                max_pages_per_site=pages_per_site,
+                max_total_pages=max_pages,
+                max_workers=max_workers,
+                preserve_query=preserve_query
+            )
+        else:
+            crawler = Crawler(
+                max_depth=3,
+                max_dir_depth=3,
+                max_pages_per_site=pages_per_site,
+                max_total_pages=max_pages,
+                preserve_query=preserve_query
+            )
 
         # Ejecutar crawling
         crawler.crawl(initial_urls)
-
-        end_time = time.time()
-        elapsed = end_time - start_time
-
+        
         # Guardar estado
         crawler.save_state(pkl_path)
+        
+        elapsed_time = time.time() - start_time
+        print(f"Crawling completado en {elapsed_time:.2f} segundos")
+        print(f"Estado guardado en: {pkl_path}")
 
-        print("=== CRAWLING COMPLETADO ===")
-        print(f"Tiempo total: {elapsed:.2f} segundos")
-        print(f"Velocidad: {len(crawler.done_list)/elapsed:.2f} páginas/segundo")
-
-    # Mostrar estadísticas
+    # Mostrar estadísticas básicas
     stats = crawler.get_statistics()
-    print("=== ESTADÍSTICAS FINALES ===")
+    print("\n=== ESTADÍSTICAS ===")
     print(f"Total de páginas: {stats.get('total_pages', 0)}")
-    
-    if stats.get('total_pages', 0) > 0:
-        print(f"Páginas dinámicas: {stats.get('dynamic_pages', 0)} ({stats.get('dynamic_pages', 0)/stats.get('total_pages', 1)*100:.1f}%)")
-        print(f"Páginas estáticas: {stats.get('static_pages', 0)} ({stats.get('static_pages', 0)/stats.get('total_pages', 1)*100:.1f}%)")
-    else:
-        print("Páginas dinámicas: 0 (0.0%)")
-        print("Páginas estáticas: 0 (0.0%)")
-    
+    print(f"Páginas dinámicas: {stats.get('dynamic_pages', 0)}")
+    print(f"Páginas estáticas: {stats.get('static_pages', 0)}")
     print(f"Páginas fallidas: {stats.get('failed_pages', 0)}")
     print(f"Dominios únicos: {len(stats.get('domains', {}))}")
 
-    print("Distribución por profundidad lógica:")
-    depth_dist = stats.get("depth_distribution", {})
+    # Distribución por profundidad
+    depth_dist = stats.get('depth_distribution', {})
     if depth_dist:
+        print("\nDistribución por profundidad:")
         for depth in sorted(depth_dist.keys()):
-            count = depth_dist[depth]
-            print(f"  Nivel {depth}: {count} páginas")
-    else:
-        print("  No hay datos de distribución por profundidad")
+            print(f"  Nivel {depth}: {depth_dist[depth]} páginas")
 
-    print("Top 10 dominios por páginas:")
-    domains = stats.get("domains", {})
+    # Top dominios
+    domains = stats.get('domains', {})
     if domains:
+        print("\nTop 5 dominios:")
         sorted_domains = sorted(domains.items(), key=lambda x: x[1], reverse=True)
-        for domain, count in sorted_domains[:10]:
+        for domain, count in sorted_domains[:5]:
             print(f"  {domain}: {count} páginas")
-    else:
-        print("  No hay datos de dominios")
 
-    # NUEVA: Generar visualización rápida con Plotly
-    print("\n=== GENERANDO VISUALIZACIÓN PLOTLY (RÁPIDA) ===")
+    # Generar visualización
+    print("\n=== GENERANDO VISUALIZACIÓN ===")
     try:
-        nodes_plotly, edges_plotly = visualize_with_plotly(crawler, "crawler_sequential_fast.html", max_nodes=1500)
-        print("✅ Visualización Plotly completada: crawler_sequential_fast.html")
-        print(f"   Nodos: {nodes_plotly}, Aristas: {edges_plotly}")
+        nodes, edges = create_simple_visualization(crawler, html_filename)
+        print(f"✅ Visualización guardada: {html_filename}")
+        print(f"   Nodos: {nodes}, Aristas: {edges}")
     except Exception as e:
-        print(f"❌ Error en visualización Plotly: {e}")
+        print(f"❌ Error en visualización: {e}")
 
-    # Generar grafo con pyvis - enfoque simple
-    num_nodes = len(crawler.done_list)
-    print("\n=== GENERANDO VISUALIZACIÓN PYVIS (COMPLETA) ===")
-    print(f"Generando visualización para {num_nodes} nodos...")
-
-    # Limitar a máximo 2000 nodos para pyvis
-    if num_nodes > 2000:
-        print(f"Demasiados nodos ({num_nodes}), limitando a 2000...")
-        tasks_to_show = crawler.done_list[:2000]
-        # Mapear IDs originales a nuevos
-        id_mapping = {task.id: i for i, task in enumerate(tasks_to_show)}
-    else:
-        tasks_to_show = crawler.done_list
-        id_mapping = {task.id: task.id for task in tasks_to_show if task.id is not None}
-
-    net = Network(notebook=False, directed=True, height="900px", width="100%")
-
-    # Agregar nodos
-    nodes_added = 0
-    for i, task in enumerate(tasks_to_show):
-        if task.id is not None:
-            source_id = id_mapping.get(task.id, i)
-            color = "#ff6b6b" if crawler.is_dynamic_page(task.url) else "#4ecdc4"
-            size = 8 + (len(task.outlinks) // 3)  # Tamaño por número de enlaces
-
-            net.add_node(
-                source_id,
-                label=str(source_id),
-                title=f"ID: {task.id}\\nURL: {task.url}\\nProfundidad: {task.depth}\\nEnlaces: {len(task.outlinks)}\\nTipo: {'Dinámico' if crawler.is_dynamic_page(task.url) else 'Estático'}",
-                color=color,
-                size=size,
-            )
-            nodes_added += 1
-
-    print(f"Nodos agregados: {nodes_added} de {len(tasks_to_show)} nodos")
-
-    # Agregar aristas
-    edges_added = 0
-    edges_skipped = 0
-    for task in tasks_to_show:
-        if task.id is not None and task.id in id_mapping:
-            source_id = id_mapping[task.id]
-            for out_id in task.outlinks:
-                if out_id in id_mapping:
-                    target_id = id_mapping[out_id]
-                    net.add_edge(source_id, target_id)
-                    edges_added += 1
-                else:
-                    edges_skipped += 1
-
-    print(f"Nodos: {nodes_added}, Aristas: {edges_added}, Aristas omitidas: {edges_skipped}")
-
-    # Guardar archivo
-    net.write_html("crawler_sequential_graph.html")
-    print("Grafo generado: crawler_sequential_graph.html")
+    print("\n✅ Ejercicio 2 completado")
+    print("Archivos generados:")
+    print(f"  - Estado: {pkl_path}")
+    print(f"  - Visualización: {html_filename}")
 
 
 if __name__ == "__main__":

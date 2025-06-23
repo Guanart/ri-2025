@@ -3,6 +3,7 @@ from pyvis.network import Network
 import os
 import time
 
+
 def main():
     # 20 primeros sitios de Netcraft
     initial_urls = [
@@ -25,9 +26,9 @@ def main():
         "https://web.whatsapp.com",
         "https://duckduckgo.com",
         "https://www.reddit.com",
-        "https://calendar.google.com"
+        "https://calendar.google.com",
     ]
-    
+
     pkl_path = "crawler_parallel_test.pkl"
 
     # Si ya existe el archivo, cargar el estado, si no, hacer crawling
@@ -38,24 +39,24 @@ def main():
     else:
         print("=== INICIANDO CRAWLING PARALELO MASIVO ===")
         start_time = time.time()
-        
+
         # Configuración agresiva para máxima velocidad
         crawler = CrawlerParallel(
-            max_depth=2,           # Profundidad moderada
-            max_dir_depth=3,       # Permitir más profundidad física
-            max_pages_per_site=20, # Más páginas por sitio
-            max_workers=12         # Muchos workers concurrentes
+            max_depth=2,  # Profundidad moderada
+            max_dir_depth=3,  # Permitir más profundidad física
+            max_pages_per_site=20,  # Más páginas por sitio
+            max_workers=12,  # Muchos workers concurrentes
         )
-        
+
         # Ejecutar crawling
         # crawler.crawl(initial_urls)
-        
+
         end_time = time.time()
         elapsed = end_time - start_time
-        
+
         # Guardar estado
         # crawler.save_state(pkl_path)
-        
+
         print(f"\n=== CRAWLING COMPLETADO ===")
         print(f"Tiempo total: {elapsed:.1f} segundos")
         print(f"Páginas procesadas: {crawler.total_processed}")
@@ -66,17 +67,21 @@ def main():
     stats = crawler.get_statistics()
     print(f"\n=== ESTADÍSTICAS FINALES ===")
     print(f"Total de páginas: {stats['total_pages']}")
-    print(f"Páginas dinámicas: {stats['dynamic_pages']} ({stats['dynamic_pages']/stats['total_pages']*100:.1f}%)")
-    print(f"Páginas estáticas: {stats['static_pages']} ({stats['static_pages']/stats['total_pages']*100:.1f}%)")
+    print(
+        f"Páginas dinámicas: {stats['dynamic_pages']} ({stats['dynamic_pages']/stats['total_pages']*100:.1f}%)"
+    )
+    print(
+        f"Páginas estáticas: {stats['static_pages']} ({stats['static_pages']/stats['total_pages']*100:.1f}%)"
+    )
     print(f"Páginas fallidas: {stats['failed_pages']}")
     print(f"Dominios únicos: {len(stats['domains'])}")
-    
+
     print(f"\nDistribución por profundidad lógica:")
-    for depth, count in sorted(stats['depth_distribution'].items()):
+    for depth, count in sorted(stats["depth_distribution"].items()):
         print(f"  Nivel {depth}: {count} páginas")
-    
+
     print(f"\nTop 10 dominios por páginas:")
-    sorted_domains = sorted(stats['domains'].items(), key=lambda x: x[1], reverse=True)
+    sorted_domains = sorted(stats["domains"].items(), key=lambda x: x[1], reverse=True)
     for domain, count in sorted_domains[:10]:
         print(f"  {domain}: {count} páginas")
 
@@ -88,7 +93,7 @@ def main():
         # Grafo completo para tamaños manejables
         print("Generando grafo completo...")
         net = Network(notebook=False, directed=True, height="900px", width="100%")
-        
+
         # Configuración optimizada para grafos grandes
         if num_nodes > 1000:
             # Nodos más pequeños y menos información para grafos grandes
@@ -99,19 +104,21 @@ def main():
             node_size_base = 8
             show_labels = True
             physics_iterations = 100
-        
+
         # Agregar nodos
         for task in crawler.done_list:
             color = "#ff6b6b" if crawler.is_dynamic_page(task.url) else "#4ecdc4"
             size = node_size_base + (task.depth * 2)
             label = str(task.id) if show_labels else ""
-            
-            net.add_node(task.id,
-                        label=label,
-                        title=f"ID: {task.id}\nURL: {task.url}\nProfundidad: {task.depth}\nEnlaces: {len(task.outlinks)}\nTipo: {'Dinámico' if crawler.is_dynamic_page(task.url) else 'Estático'}",
-                        color=color,
-                        size=size)
-        
+
+            net.add_node(
+                task.id,
+                label=label,
+                title=f"ID: {task.id}\nURL: {task.url}\nProfundidad: {task.depth}\nEnlaces: {len(task.outlinks)}\nTipo: {'Dinámico' if crawler.is_dynamic_page(task.url) else 'Estático'}",
+                color=color,
+                size=size,
+            )
+
         # Agregar aristas
         edge_count = 0
         for task in crawler.done_list:
@@ -119,11 +126,12 @@ def main():
                 if out_id < len(crawler.done_list):
                     net.add_edge(task.id, out_id)
                     edge_count += 1
-        
+
         print(f"Nodos: {num_nodes}, Aristas: {edge_count}")
-        
+
         # Configuración optimizada según tamaño
-        net.set_options(f"""
+        net.set_options(
+            f"""
         var options = {{
           "physics": {{
             "enabled": true,
@@ -150,43 +158,50 @@ def main():
             "hideNodesOnDrag": {str(num_nodes > 1000).lower()}
           }}
         }}
-        """)
-        
-        net.show('crawler_parallel_graph.html')
+        """
+        )
+
+        net.show("crawler_parallel_graph.html")
         print("Grafo completo generado: crawler_parallel_graph.html")
-        
+
     else:
         # Para grafos muy grandes, generar una muestra representativa
-        print(f"Grafo demasiado grande ({num_nodes} nodos). Generando muestra de 2000 nodos más importantes...")
-        
+        print(
+            f"Grafo demasiado grande ({num_nodes} nodos). Generando muestra de 2000 nodos más importantes..."
+        )
+
         # Seleccionar nodos más importantes (con más enlaces)
-        tasks_by_importance = sorted(crawler.done_list, 
-                                   key=lambda t: len(t.outlinks), reverse=True)
+        tasks_by_importance = sorted(
+            crawler.done_list, key=lambda t: len(t.outlinks), reverse=True
+        )
         sample_tasks = tasks_by_importance[:2000]
-        
+
         # Crear mapeo de IDs originales a nuevos
         id_mapping = {task.id: i for i, task in enumerate(sample_tasks)}
-        
+
         net = Network(notebook=False, directed=True, height="900px", width="100%")
-        
+
         # Agregar nodos de la muestra
         for i, task in enumerate(sample_tasks):
             color = "#ff6b6b" if crawler.is_dynamic_page(task.url) else "#4ecdc4"
             size = 8 + (len(task.outlinks) // 2)  # Tamaño por importancia
-            
-            net.add_node(i,
-                        label=str(i),
-                        title=f"ID Original: {task.id}\nURL: {task.url}\nProfundidad: {task.depth}\nEnlaces: {len(task.outlinks)}\nTipo: {'Dinámico' if crawler.is_dynamic_page(task.url) else 'Estático'}",
-                        color=color,
-                        size=size)
-        
+
+            net.add_node(
+                i,
+                label=str(i),
+                title=f"ID Original: {task.id}\nURL: {task.url}\nProfundidad: {task.depth}\nEnlaces: {len(task.outlinks)}\nTipo: {'Dinámico' if crawler.is_dynamic_page(task.url) else 'Estático'}",
+                color=color,
+                size=size,
+            )
+
         # Agregar aristas entre nodos de la muestra
         for i, task in enumerate(sample_tasks):
             for out_id in task.outlinks:
                 if out_id in id_mapping:
                     net.add_edge(i, id_mapping[out_id])
-        
-        net.set_options("""
+
+        net.set_options(
+            """
         var options = {
           "physics": {
             "enabled": true,
@@ -202,10 +217,12 @@ def main():
             "stabilization": {"iterations": 80}
           }
         }
-        """)
-        
-        net.show('crawler_parallel_sample.html')
+        """
+        )
+
+        net.show("crawler_parallel_sample.html")
         print("Muestra representativa generada: crawler_parallel_sample.html")
+
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,7 @@
 from lib.Crawler import Crawler
 import os
 
+
 def test_crawler():
     """Test rápido del crawler secuencial"""
     initial_urls = [
@@ -16,11 +17,11 @@ def test_crawler():
         os.remove(pkl_path)
 
     print("=== INICIANDO CRAWLING SECUENCIAL DE PRUEBA ===")
-    
+
     # Configuración para crawling rápido
     crawler = Crawler(
         max_depth=1,  # Solo profundidad 1
-        max_dir_depth=2,  
+        max_dir_depth=2,
         max_pages_per_site=5,  # Pocas páginas por sitio
         max_total_pages=20,  # Límite muy bajo
     )
@@ -37,7 +38,9 @@ def test_crawler():
     print(f"Total de páginas: {stats['total_pages']}")
     print(f"Páginas dinámicas: {stats['dynamic_pages']}")
     print(f"Páginas estáticas: {stats['static_pages']}")
-    print(f"Páginas fallidas: {stats.get('failed_pages', 'N/A')}")  # Usar get() para compatibilidad
+    print(
+        f"Páginas fallidas: {stats.get('failed_pages', 'N/A')}"
+    )  # Usar get() para compatibilidad
     print(f"Dominios únicos: {len(stats['domains'])}")
 
     print("\n=== PROBANDO CARGA DE ESTADO ===")
@@ -48,6 +51,7 @@ def test_crawler():
     print(f"Páginas fallidas desde estado: {stats2.get('failed_pages', 'N/A')}")
 
     print("✅ Prueba completada exitosamente!")
+
 
 if __name__ == "__main__":
     test_crawler()

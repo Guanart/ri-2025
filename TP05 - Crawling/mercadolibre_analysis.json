@@ -1,9 +1,9 @@
 {
-  "total_pages": 0,
-  "dynamic_pages": 0,
-  "static_pages": 0,
-  "depth_distribution": {},
-  "dir_depth_distribution": {},
-  "domains": {},
-  "failed_pages": 1
+    "total_pages": 0,
+    "dynamic_pages": 0,
+    "static_pages": 0,
+    "depth_distribution": {},
+    "dir_depth_distribution": {},
+    "domains": {},
+    "failed_pages": 1,
 }
