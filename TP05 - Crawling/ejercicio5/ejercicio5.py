@@ -124,7 +124,7 @@ def main():
     pagerank = nx.pagerank(G, alpha=0.85)
     hits_auth, _ = nx.hits(G, max_iter=1000)
 
-    # Ordenamientos
+    # Ordenamientos (de mayor a menor)
     orden_pr = [
         node for node, _ in sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
     ]
@@ -133,13 +133,20 @@ def main():
     ]
 
     # Calcular overlap para ambos enfoques
+    # Creamos una lista de valores de k, que van de 10 hasta el menor valor entre 500 y la cantidad de nodos del grafo, de a 10 en 10.
     ks = list(range(10, min(501, len(G.nodes())), 10))
+    # Inicializamos una lista vacía para guardar los valores de solapamiento (overlap) entre los top-k de autoridad y pagerank.
     overlap_pr = []
 
+    # Iteramos para cada valor de k en la lista ks.
     for k in ks:
+        # Obtenemos el conjunto de los k nodos con mayor autoridad.
         top_auth = set(orden_auth[:k])
+        # Obtenemos el conjunto de los k nodos con mayor pagerank.
         top_pr = set(orden_pr[:k])
+        # Calculamos la intersección entre ambos conjuntos (nodos que están en ambos top-k).
         inter_pr = top_auth & top_pr
+        # Calculamos el porcentaje de solapamiento y lo agregamos a la lista.
         overlap_pr.append(len(inter_pr) / k)
 
     # Graficar comparación
@@ -147,7 +154,7 @@ def main():
     plt.plot(ks, overlap_pr, label="Crawling por PageRank vs Authority", marker="x")
     plt.xlabel("k (top páginas consideradas)")
     plt.ylabel("Porcentaje de overlap con Authority")
-    plt.title("Evolución del overlap con Authority para dos estrategias de crawling")
+    plt.title("Evolución del overlap entre listas ordenadas por PageRank y Authority (HITS)")
     plt.grid(True)
     plt.legend()
     
