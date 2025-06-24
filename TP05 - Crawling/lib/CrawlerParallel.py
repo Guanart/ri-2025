@@ -279,11 +279,9 @@ class CrawlerParallel:
                     self.todo_queue.task_done()
 
                 except Empty:
-                    # Verificar si hay workers activos o cola vacía
-                    if self.todo_queue.empty():
-                        time.sleep(0.1)
-                        if self.todo_queue.empty():  # Doble verificación
-                            break
+                    # Si la cola está vacía, verificar si debe continuar
+                    if self.todo_queue.empty() and len(self.done_list) >= self.max_total_pages:
+                        break
                     continue
                 except Exception as e:
                     print(f"Error en worker {worker_id}: {e}")
@@ -314,8 +312,10 @@ class CrawlerParallel:
                 # Esperar a que terminen todos los workers
                 concurrent.futures.wait(futures, timeout=None)
             except KeyboardInterrupt:
-                print("\nInterrumpido por usuario...")
+                print("\n🛑 Interrupción detectada, parando workers...")
                 self.should_stop.set()
+                # Dar tiempo limitado para terminar
+                concurrent.futures.wait(futures, timeout=3)
 
         print(
             f"\nCrawling completado: {self.total_processed} páginas, {self.failed_count} fallos"
@@ -417,50 +417,3 @@ class CrawlerParallel:
                     G.add_edge(task.id, out_id)
 
         return G
-
-    def calculate_pagerank_and_hits(self):
-        """Calcula PageRank y HITS."""
-        G = self.build_networkx_graph()
-
-        if len(G.nodes()) == 0:
-            return {}, {}, {}
-
-        try:
-            pagerank = nx.pagerank(G, alpha=0.85, max_iter=100)
-            hubs, authorities = nx.hits(G, max_iter=100)
-            return pagerank, hubs, authorities
-        except Exception:
-            return {}, {}, {}
-
-    def simulate_pagerank_crawling(self, pagerank_scores: Dict, max_pages: int = 500):
-        """Simula un crawling siguiendo el orden de PageRank."""
-        if not pagerank_scores:
-            return []
-
-        # Ordenar páginas por PageRank descendente
-        sorted_by_pr = sorted(pagerank_scores.items(), key=lambda x: x[1], reverse=True)
-
-        # Simular crawling hasta max_pages
-        crawled_order = []
-        for node_id, score in sorted_by_pr[:max_pages]:
-            # Buscar la tarea correspondiente
-            for task in self.done_list:
-                if task.id == node_id:
-                    crawled_order.append(task)
-                    break
-
-        return crawled_order
-
-    def calculate_overlap(
-        self, list1: List, list2: List, top_k_percent: float = 0.1
-    ) -> float:
-        """Calcula el porcentaje de overlap entre dos listas ordenadas."""
-        if not list1 or not list2:
-            return 0.0
-
-        k = max(1, int(len(list1) * top_k_percent))
-        top_k_1 = set(item.id if hasattr(item, "id") else item for item in list1[:k])
-        top_k_2 = set(item.id if hasattr(item, "id") else item for item in list2[:k])
-
-        intersection = len(top_k_1.intersection(top_k_2))
-        return (intersection / k) * 100 if k > 0 else 0.0

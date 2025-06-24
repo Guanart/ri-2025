@@ -6,19 +6,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from lib.Crawler import Crawler
 from lib.CrawlerParallel import CrawlerParallel
 import matplotlib.pyplot as plt
+import networkx as nx
 import os
-
-
-def truncate_crawler_results(crawler, max_pages=500):
-    """Función auxiliar para truncar resultados de manera type-safe"""
-    if len(crawler.done_list) > max_pages:
-        # Usar slicing para crear una nueva lista
-        crawler.done_list = crawler.done_list[:max_pages]
-    return crawler
 
 
 def main():
     print("=== EJERCICIO 5: ANÁLISIS DE PAGERANK Y HITS ===")
+    print("Consigna: Recolección de 500 páginas para análisis de PageRank y HITS")
     
     # Elegir tipo de crawler
     use_parallel = input("¿Usar crawler paralelo? (s/N): ").lower().strip() == "s"
@@ -26,16 +20,22 @@ def main():
     # Elegir si preservar query strings
     preserve_query = input("¿Preservar query strings en las URLs? (s/N): ").lower().strip() == "s"
     
-    # Elegir cantidad de páginas
-    while True:
-        try:
-            max_pages = int(input("Ingresa número de páginas para análisis (recomendado 200-1000): "))
-            if 50 <= max_pages <= 5000:
-                break
-            else:
-                print("Por favor ingresa un número entre 50 y 5000")
-        except ValueError:
-            print("Por favor ingresa un número válido")
+    # Fijar en 500 páginas según la consigna
+    max_pages = 500
+    print(f"Páginas objetivo: {max_pages} (según consigna del ejercicio)")
+    
+    # Elegir cantidad de páginas (opcional para experimentar)
+    change_pages = input("¿Cambiar cantidad de páginas para experimentar? (s/N): ").lower().strip() == "s"
+    if change_pages:
+        while True:
+            try:
+                max_pages = int(input("Ingresa número de páginas para análisis (recomendado 200-1000): "))
+                if 50 <= max_pages <= 5000:
+                    break
+                else:
+                    print("Por favor ingresa un número entre 50 y 5000")
+            except ValueError:
+                print("Por favor ingresa un número válido")
     
     # Si es paralelo, elegir número de workers
     max_workers = 4  # Default
@@ -55,9 +55,9 @@ def main():
     query_suffix = "query" if preserve_query else "noquery"
     pkl_path = f"ejercicio5_{crawler_type}_{max_pages}p_{query_suffix}.pkl"
     
-    # URLs semilla (top 20 Netcraft) - https://trends.netcraft.com/topsites
+    # URLs semilla
     initial_urls = [
-        "https://unlu.edu.ar"
+        "https://www.google.com"
     ]
 
     # Si ya existe el archivo, cargar el estado, si no, hacer crawling
@@ -77,7 +77,7 @@ def main():
         if use_parallel:
             print(f"  - Workers: {max_workers}")
         
-        # Crear crawler según configuración
+        # Crear crawler
         if use_parallel:
             crawler = CrawlerParallel(
                 max_depth=3,
@@ -101,9 +101,6 @@ def main():
         crawler.crawl(initial_urls)
         elapsed = time.time() - start_time
         
-        # Asegurar que no excedemos el límite usando la función auxiliar
-        crawler = truncate_crawler_results(crawler, max_pages)
-        
         # Guardar estado
         crawler.save_state(pkl_path)
         
@@ -114,112 +111,73 @@ def main():
             print(f"Velocidad: {len(crawler.done_list)/elapsed:.2f} páginas/segundo")
 
 ######################################################################################
-#   Calcular PageRank y HITS
+#   Calcular PageRank y HITS usando el grafo completo como root set
 ######################################################################################
-    print("Calculando PageRank y HITS...")
-    pagerank, hubs, authorities = crawler.calculate_pagerank_and_hits()
+    print("Calculando PageRank y HITS usando el grafo completo como root set...")
+    G = crawler.build_networkx_graph()
 
-    if not pagerank:
-        print("Error: No se pudieron calcular PageRank y HITS")
+    if len(G.nodes()) == 0:
+        print("Error: No se pudo construir el grafo")
         return
 
-    # Ordenar páginas por PageRank y por Authorities
-    sorted_by_pagerank = sorted(
-        crawler.done_list, key=lambda x: pagerank.get(x.id, 0), reverse=True
-    )
-    sorted_by_authorities = sorted(
-        crawler.done_list, key=lambda x: authorities.get(x.id, 0), reverse=True
-    )
+    # Calcular PageRank y HITS
+    pagerank = nx.pagerank(G, alpha=0.85)
+    hits_auth, _ = nx.hits(G, max_iter=1000)
 
-    # Calcular overlap en diferentes porcentajes del top-k
-    k_values = list(range(10, 501, 10))  # De 10 a 500 de 10 en 10
-    overlaps_pagerank_vs_authorities = []
-    overlaps_real_vs_authority = []
+    # Ordenamientos
+    orden_pr = [
+        node for node, _ in sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
+    ]
+    orden_auth = [
+        node for node, _ in sorted(hits_auth.items(), key=lambda x: x[1], reverse=True)
+    ]
 
-    for k in k_values:
-        if k <= len(crawler.done_list):
-            # Overlap PageRank vs Authority
-            overlap_pr_auth = crawler.calculate_overlap(
-                sorted_by_pagerank, sorted_by_authorities, k / len(crawler.done_list)
-            )
-            overlaps_pagerank_vs_authorities.append(overlap_pr_auth)
-            
-            # Simular "Crawling real vs Authority" - usar orden de crawling vs authority
-            crawling_order = crawler.done_list  # Orden en que se crawlearon
-            overlap_real_auth = crawler.calculate_overlap(
-                crawling_order, sorted_by_authorities, k / len(crawler.done_list)
-            )
-            overlaps_real_vs_authority.append(overlap_real_auth)
-        else:
-            break
+    # Calcular overlap para ambos enfoques
+    ks = list(range(10, min(501, len(G.nodes())), 10))
+    overlap_pr = []
 
-    # Ajustar k_values al número real de datos
-    k_values = k_values[:len(overlaps_pagerank_vs_authorities)]
+    for k in ks:
+        top_auth = set(orden_auth[:k])
+        top_pr = set(orden_pr[:k])
+        inter_pr = top_auth & top_pr
+        overlap_pr.append(len(inter_pr) / k)
 
-    # Crear el gráfico de overlap como en la imagen
+    # Graficar comparación
     plt.figure(figsize=(10, 6))
+    plt.plot(ks, overlap_pr, label="Crawling por PageRank vs Authority", marker="x")
+    plt.xlabel("k (top páginas consideradas)")
+    plt.ylabel("Porcentaje de overlap con Authority")
+    plt.title("Evolución del overlap con Authority para dos estrategias de crawling")
+    plt.grid(True)
+    plt.legend()
     
-    # Línea azul: Crawling real vs Authority
-    plt.plot(
-        k_values,
-        [o / 100 for o in overlaps_real_vs_authority],  # Convertir a decimal
-        'o-',
-        color='steelblue',
-        linewidth=2,
-        markersize=4,
-        label='Crawling real vs Authority'
-    )
-    
-    # Línea naranja: Crawling por PageRank vs Authority  
-    plt.plot(
-        k_values,
-        [o / 100 for o in overlaps_pagerank_vs_authorities],  # Convertir a decimal
-        's-',
-        color='orange',
-        linewidth=2,
-        markersize=4,
-        label='Crawling por PageRank vs Authority'
-    )
-    
-    plt.title('Evolución del overlap con Authority para dos estrategias de crawling', fontsize=14)
-    plt.xlabel('k (top páginas consideradas)', fontsize=12)
-    plt.ylabel('Porcentaje de overlap con Authority', fontsize=12)
-    plt.grid(True, alpha=0.3)
-    plt.legend(fontsize=11)
-    plt.xlim(0, max(k_values))
-    plt.ylim(0, 1.0)
-    
-    # Configurar el eje Y para mostrar de 0.0 a 1.0
-    plt.gca().set_ylim(0, 1.0)
-    plt.gca().set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    
-    plt.tight_layout()
-    plt.savefig("overlap_analysis.png", dpi=300, bbox_inches="tight")
+    # Guardar con nombre descriptivo
+    graph_filename = f"overlap_analysis_{crawler_type}_{max_pages}p_{query_suffix}.png"
+    plt.savefig(graph_filename)
+    print(f"Gráfico guardado como: {graph_filename}")
 
-    # Mostrar resultados
-    print("\n=== RESULTADOS ===")
-    print(f"Total de páginas analizadas: {len(crawler.done_list)}")
+    print("\n\nOverlap graficado y guardado.")
+
+    # Mostrar algunos resultados básicos
+    print(f"\nTotal de páginas analizadas: {len(crawler.done_list)}")
     print(f"Páginas con PageRank > 0: {len([p for p in pagerank.values() if p > 0])}")
-    print(
-        f"Páginas con Authority > 0: {len([a for a in authorities.values() if a > 0])}"
-    )
+    print(f"Páginas con Authority > 0: {len([a for a in hits_auth.values() if a > 0])}")
 
     print("\nTop 5 páginas por PageRank:")
-    for i, task in enumerate(sorted_by_pagerank[:5]):
-        print(f"  {i+1}. {task.url[:60]} (PR: {pagerank.get(task.id, 0):.6f})")
+    for i, node_id in enumerate(orden_pr[:5]):
+        # Buscar la tarea correspondiente
+        for task in crawler.done_list:
+            if task.id == node_id:
+                print(f"  {i+1}. {task.url[:80]} (PR: {pagerank[node_id]:.6f})")
+                break
 
     print("\nTop 5 páginas por Authorities:")
-    for i, task in enumerate(sorted_by_authorities[:5]):
-        print(f"  {i+1}. {task.url[:60]} (Auth: {authorities.get(task.id, 0):.6f})")
-
-    print("\nOverlap entre estrategias (valores seleccionados):")
-    sample_indices = [4, 9, 19, 29, 49]  # k=50, 100, 200, 300, 500
-    for idx in sample_indices:
-        if idx < len(k_values):
-            k = k_values[idx]
-            overlap_real = overlaps_real_vs_authority[idx]
-            overlap_pr = overlaps_pagerank_vs_authorities[idx]
-            print(f"  Top {k}: Real vs Auth = {overlap_real:.1f}%, PageRank vs Auth = {overlap_pr:.1f}%")
+    for i, node_id in enumerate(orden_auth[:5]):
+        # Buscar la tarea correspondiente
+        for task in crawler.done_list:
+            if task.id == node_id:
+                print(f"  {i+1}. {task.url[:80]} (Auth: {hits_auth[node_id]:.6f})")
+                break
 
 
 if __name__ == "__main__":
