@@ -58,17 +58,8 @@ class Crawler:
         self.total_processed: int = 0
         self.failed_count: int = 0
 
-    def push(self, urls: List[str], depth: int) -> None:
-        for url in urls:
-            if url not in self.url_to_task:
-                task = PageTask(url=url, depth=depth)
-                self.todo_list.append(task)
-                self.url_to_task[url] = task
-
     def fetch_page(self, url: str, retries: int = 1) -> Optional[str]:
         """Descarga una página con reintentos y timeout optimizado."""
-        import time
-
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
         }
@@ -182,7 +173,7 @@ class Crawler:
 
     def crawl(self, initial_urls: List[str]) -> None:
         """Ejecuta crawling secuencial."""
-        print(f"Iniciando crawling secuencial...")
+        print("Iniciando crawling secuencial...")
 
         # Agregar URLs iniciales
         for url in initial_urls:
@@ -236,7 +227,9 @@ class Crawler:
                             link in self.url_to_task
                             and self.url_to_task[link].id is not None
                         ):
-                            current.outlinks.append(self.url_to_task[link].id)
+                            target_id = self.url_to_task[link].id
+                            if target_id is not None:
+                                current.outlinks.append(target_id)
 
                 # Agregar a lista de completadas
                 self.done_list.append(current)

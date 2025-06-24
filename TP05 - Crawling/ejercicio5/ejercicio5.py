@@ -18,69 +18,104 @@ def truncate_crawler_results(crawler, max_pages=500):
 
 
 def main():
+    print("=== EJERCICIO 5: ANÁLISIS DE PAGERANK Y HITS ===")
+    
     # Elegir tipo de crawler
     use_parallel = input("¿Usar crawler paralelo? (s/N): ").lower().strip() == "s"
-
-    pkl_path = "ejercicio5_500pages_crawl.pkl"
+    
+    # Elegir si preservar query strings
+    preserve_query = input("¿Preservar query strings en las URLs? (s/N): ").lower().strip() == "s"
+    
+    # Elegir cantidad de páginas
+    while True:
+        try:
+            max_pages = int(input("Ingresa número de páginas para análisis (recomendado 200-1000): "))
+            if 50 <= max_pages <= 5000:
+                break
+            else:
+                print("Por favor ingresa un número entre 50 y 5000")
+        except ValueError:
+            print("Por favor ingresa un número válido")
+    
+    # Si es paralelo, elegir número de workers
+    max_workers = 4  # Default
+    if use_parallel:
+        while True:
+            try:
+                max_workers = int(input("Número de workers paralelos (recomendado 2-12): "))
+                if 2 <= max_workers <= 12:
+                    break
+                else:
+                    print("Por favor ingresa un número entre 2 y 12")
+            except ValueError:
+                print("Por favor ingresa un número válido")
+    
+    # Configurar archivos con nombres que incluyan los parámetros
+    crawler_type = "parallel" if use_parallel else "sequential"
+    query_suffix = "query" if preserve_query else "noquery"
+    pkl_path = f"ejercicio5_{crawler_type}_{max_pages}p_{query_suffix}.pkl"
+    
+    # URLs semilla (top 20 Netcraft) - https://trends.netcraft.com/topsites
+    initial_urls = [
+        "https://unlu.edu.ar"
+    ]
 
     # Si ya existe el archivo, cargar el estado, si no, hacer crawling
     if os.path.exists(pkl_path):
         print("Cargando estado guardado...")
-        # Determinar qué tipo de crawler usar basado en el archivo
         if use_parallel:
             crawler = CrawlerParallel.load_state(pkl_path)
         else:
             crawler = Crawler.load_state(pkl_path)
+        print(f"Estado cargado: {len(crawler.done_list)} páginas")
     else:
-        print("Iniciando crawling para 500 páginas...")
-        # Usar las 20 URLs de Netcraft como semilla
-        initial_urls = [
-            "https://www.google.com",
-            "https://www.youtube.com",
-            "https://mail.google.com",
-            "https://outlook.office.com",
-            "https://www.facebook.com",
-            "https://docs.google.com",
-            "https://chatgpt.com",
-            "https://login.microsoftonline.com",
-            "https://www.linkedin.com",
-            "https://accounts.google.com",
-            "https://x.com",
-            "https://www.bing.com",
-            "https://www.instagram.com",
-            "https://drive.google.com",
-            "https://github.com",
-            "https://web.whatsapp.com",
-            "https://duckduckgo.com",
-            "https://www.reddit.com",
-            "https://calendar.google.com",
-            "https://www.wikipedia.org",
-        ]
-
+        print(f"=== INICIANDO CRAWLING {'PARALELO' if use_parallel else 'SECUENCIAL'} ===")
+        print("Configuración:")
+        print(f"  - Tipo: {'Paralelo' if use_parallel else 'Secuencial'}")
+        print(f"  - Páginas objetivo: {max_pages}")
+        print(f"  - Preservar query: {'Sí' if preserve_query else 'No'}")
         if use_parallel:
-            print("Usando CrawlerParallel...")
+            print(f"  - Workers: {max_workers}")
+        
+        # Crear crawler según configuración
+        if use_parallel:
             crawler = CrawlerParallel(
-                max_depth=2,
-                max_dir_depth=2,
-                max_pages_per_site=25,
-                max_total_pages=500,
-                max_workers=8,
+                max_depth=3,
+                max_dir_depth=3,
+                max_pages_per_site=20,
+                max_total_pages=max_pages,
+                max_workers=max_workers,
+                preserve_query=preserve_query
             )
         else:
-            print("Usando Crawler secuencial...")
             crawler = Crawler(
-                max_depth=2, max_dir_depth=2, max_pages_per_site=25, max_total_pages=500
+                max_depth=3,
+                max_dir_depth=3,
+                max_pages_per_site=20,
+                max_total_pages=max_pages,
+                preserve_query=preserve_query
             )
-
+        
+        import time
+        start_time = time.time()
         crawler.crawl(initial_urls)
-
-        # Asegurar que tenemos exactamente 500 páginas
-        crawler = truncate_crawler_results(crawler, 500)
-
+        elapsed = time.time() - start_time
+        
+        # Asegurar que no excedemos el límite usando la función auxiliar
+        crawler = truncate_crawler_results(crawler, max_pages)
+        
+        # Guardar estado
         crawler.save_state(pkl_path)
-        print(f"Crawling finalizado. Páginas recolectadas: {len(crawler.done_list)}")
+        
+        print("\n=== CRAWLING COMPLETADO ===")
+        print(f"Tiempo total: {elapsed:.2f} segundos")
+        print(f"Páginas obtenidas: {len(crawler.done_list)}")
+        if elapsed > 0:
+            print(f"Velocidad: {len(crawler.done_list)/elapsed:.2f} páginas/segundo")
 
-    # Calcular PageRank y HITS
+######################################################################################
+#   Calcular PageRank y HITS
+######################################################################################
     print("Calculando PageRank y HITS...")
     pagerank, hubs, authorities = crawler.calculate_pagerank_and_hits()
 
@@ -97,96 +132,69 @@ def main():
     )
 
     # Calcular overlap en diferentes porcentajes del top-k
-    percentages = [0.1, 0.2, 0.3, 0.4, 0.5]
+    k_values = list(range(10, 501, 10))  # De 10 a 500 de 10 en 10
     overlaps_pagerank_vs_authorities = []
+    overlaps_real_vs_authority = []
 
-    for pct in percentages:
-        # Overlap entre PageRank y Authorities (esto es lo que pide la consigna)
-        overlap = crawler.calculate_overlap(
-            sorted_by_pagerank, sorted_by_authorities, pct
-        )
-        overlaps_pagerank_vs_authorities.append(overlap)
+    for k in k_values:
+        if k <= len(crawler.done_list):
+            # Overlap PageRank vs Authority
+            overlap_pr_auth = crawler.calculate_overlap(
+                sorted_by_pagerank, sorted_by_authorities, k / len(crawler.done_list)
+            )
+            overlaps_pagerank_vs_authorities.append(overlap_pr_auth)
+            
+            # Simular "Crawling real vs Authority" - usar orden de crawling vs authority
+            crawling_order = crawler.done_list  # Orden en que se crawlearon
+            overlap_real_auth = crawler.calculate_overlap(
+                crawling_order, sorted_by_authorities, k / len(crawler.done_list)
+            )
+            overlaps_real_vs_authority.append(overlap_real_auth)
+        else:
+            break
 
-    # Graficar resultados
-    plt.figure(figsize=(15, 10))
+    # Ajustar k_values al número real de datos
+    k_values = k_values[:len(overlaps_pagerank_vs_authorities)]
 
-    # Gráfico 1: Top 20 PageRank Scores
-    plt.subplot(2, 3, 1)
-    top_pagerank_scores = [pagerank.get(task.id, 0) for task in sorted_by_pagerank[:20]]
-    plt.bar(range(20), top_pagerank_scores)
-    plt.title("Top 20 PageRank Scores")
-    plt.xlabel("Páginas (ordenadas por PageRank)")
-    plt.ylabel("PageRank Score")
-    plt.xticks(range(0, 20, 2))
-
-    # Gráfico 2: Top 20 Authority Scores
-    plt.subplot(2, 3, 2)
-    top_authority_scores = [
-        authorities.get(task.id, 0) for task in sorted_by_authorities[:20]
-    ]
-    plt.bar(range(20), top_authority_scores)
-    plt.title("Top 20 Authority Scores")
-    plt.xlabel("Páginas (ordenadas por Authorities)")
-    plt.ylabel("Authority Score")
-    plt.xticks(range(0, 20, 2))
-
-    # Gráfico 3: Overlap entre PageRank y Authorities
-    plt.subplot(2, 3, 3)
+    # Crear el gráfico de overlap como en la imagen
+    plt.figure(figsize=(10, 6))
+    
+    # Línea azul: Crawling real vs Authority
     plt.plot(
-        [p * 100 for p in percentages],
-        overlaps_pagerank_vs_authorities,
-        "o-",
-        color="red",
+        k_values,
+        [o / 100 for o in overlaps_real_vs_authority],  # Convertir a decimal
+        'o-',
+        color='steelblue',
         linewidth=2,
-        markersize=8,
-        label="PageRank vs Authorities",
+        markersize=4,
+        label='Crawling real vs Authority'
     )
-    plt.title("Overlap entre PageRank y Authorities")
-    plt.xlabel("Top-K% de páginas")
-    plt.ylabel("Porcentaje de overlap")
-    plt.legend()
+    
+    # Línea naranja: Crawling por PageRank vs Authority  
+    plt.plot(
+        k_values,
+        [o / 100 for o in overlaps_pagerank_vs_authorities],  # Convertir a decimal
+        's-',
+        color='orange',
+        linewidth=2,
+        markersize=4,
+        label='Crawling por PageRank vs Authority'
+    )
+    
+    plt.title('Evolución del overlap con Authority para dos estrategias de crawling', fontsize=14)
+    plt.xlabel('k (top páginas consideradas)', fontsize=12)
+    plt.ylabel('Porcentaje de overlap con Authority', fontsize=12)
     plt.grid(True, alpha=0.3)
-
-    # Gráfico 4: Distribución por profundidad lógica
-    plt.subplot(2, 3, 4)
-    stats = crawler.get_statistics()
-    depths = list(stats.get("depth_distribution", {}).keys())
-    counts = list(stats.get("depth_distribution", {}).values())
-    if depths and counts:
-        plt.bar(depths, counts)
-        plt.title("Distribución por profundidad lógica")
-        plt.xlabel("Profundidad")
-        plt.ylabel("Número de páginas")
-
-    # Gráfico 5: Distribución dinámicas vs estáticas
-    plt.subplot(2, 3, 5)
-    dynamic_pages = stats.get("dynamic_pages", 0)
-    static_pages = stats.get("static_pages", 0)
-    plt.pie(
-        [dynamic_pages, static_pages],
-        labels=["Dinámicas", "Estáticas"],
-        autopct="%1.1f%%",
-        startangle=90,
-    )
-    plt.title("Páginas Dinámicas vs Estáticas")
-
-    # Gráfico 6: Distribución por dominio (top 10)
-    plt.subplot(2, 3, 6)
-    domains = stats.get("domains", {})
-    if domains:
-        sorted_domains = sorted(domains.items(), key=lambda x: x[1], reverse=True)[:10]
-        domain_names = [
-            d[0][:20] + "..." if len(d[0]) > 20 else d[0] for d in sorted_domains
-        ]
-        domain_counts = [d[1] for d in sorted_domains]
-        plt.barh(range(len(domain_names)), domain_counts)
-        plt.yticks(range(len(domain_names)), domain_names)
-        plt.title("Top 10 Dominios")
-        plt.xlabel("Número de páginas")
-
+    plt.legend(fontsize=11)
+    plt.xlim(0, max(k_values))
+    plt.ylim(0, 1.0)
+    
+    # Configurar el eje Y para mostrar de 0.0 a 1.0
+    plt.gca().set_ylim(0, 1.0)
+    plt.gca().set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    
     plt.tight_layout()
-    plt.savefig("pagerank_hits_analysis.png", dpi=300, bbox_inches="tight")
-    plt.show()
+    plt.savefig("overlap_analysis.png", dpi=300, bbox_inches="tight")
 
     # Mostrar resultados
     print("\n=== RESULTADOS ===")
@@ -204,9 +212,14 @@ def main():
     for i, task in enumerate(sorted_by_authorities[:5]):
         print(f"  {i+1}. {task.url[:60]} (Auth: {authorities.get(task.id, 0):.6f})")
 
-    print("\nOverlap entre PageRank y Authorities:")
-    for i, pct in enumerate(percentages):
-        print(f"  Top {pct*100:.0f}%: {overlaps_pagerank_vs_authorities[i]:.1f}%")
+    print("\nOverlap entre estrategias (valores seleccionados):")
+    sample_indices = [4, 9, 19, 29, 49]  # k=50, 100, 200, 300, 500
+    for idx in sample_indices:
+        if idx < len(k_values):
+            k = k_values[idx]
+            overlap_real = overlaps_real_vs_authority[idx]
+            overlap_pr = overlaps_pagerank_vs_authorities[idx]
+            print(f"  Top {k}: Real vs Auth = {overlap_real:.1f}%, PageRank vs Auth = {overlap_pr:.1f}%")
 
 
 if __name__ == "__main__":

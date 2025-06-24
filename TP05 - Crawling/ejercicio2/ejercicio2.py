@@ -112,33 +112,15 @@ def main():
     preserve_query = input("\n¿Preservar query strings en las URLs? (s/N): ").lower().strip() == 's'
     
     # Elegir cantidad de páginas
-    print("\nOpciones de páginas:")
-    print("1. 50 páginas")
-    print("2. 150 páginas")
-    print("3. 500 páginas")
-    print("4. Personalizado")
-    
-    choice = input("Selecciona opción (1-4): ").strip()
-    
-    if choice == "1":
-        max_pages = 50
-    elif choice == "2":
-        max_pages = 150
-    elif choice == "3":
-        max_pages = 500
-    elif choice == "4":
-        while True:
-            try:
-                max_pages = int(input("Ingresa número de páginas (recomendado de 10 a 2000): "))
-                if 10 <= max_pages <= 10000:
-                    break
-                else:
-                    print("Por favor ingresa un número entre 10 y 10000")
-            except ValueError:
-                print("Por favor ingresa un número válido")
-    else:
-        print("Opción no válida, usando 150 páginas por defecto")
-        max_pages = 150
+    while True:
+        try:
+            max_pages = int(input("Ingresa número de páginas (recomendado de 10 a 2000): "))
+            if 10 <= max_pages <= 10000:
+                break
+            else:
+                print("Por favor ingresa un número entre 10 y 10000")
+        except ValueError:
+            print("Por favor ingresa un número válido")
     
     # Elegir páginas por sitio
     while True:
@@ -151,15 +133,15 @@ def main():
         except ValueError:
             print("Por favor ingresa un número válido")
     
-    # URLs semilla (top 20 Netcraft)
+    # URLs semilla (top 20 Netcraft) - https://trends.netcraft.com/topsites
     initial_urls = [
         "https://www.google.com", "https://www.youtube.com", "https://mail.google.com",
         "https://outlook.office.com", "https://www.facebook.com", "https://docs.google.com",
         "https://chatgpt.com", "https://login.microsoftonline.com", "https://www.linkedin.com",
         "https://accounts.google.com", "https://x.com", "https://www.bing.com",
-        "https://www.instagram.com", "https://drive.google.com", "https://github.com",
-        "https://web.whatsapp.com", "https://duckduckgo.com", "https://www.reddit.com",
-        "https://calendar.google.com", "https://www.wikipedia.org"
+        "https://www.instagram.com", "https://drive.google.com", "https://campus-1001.ammon.cloud",
+        "https://github.com", "https://web.whatsapp.com", "https://duckduckgo.com",
+        "https://www.reddit.com", "https://calendar.google.com"
     ]
 
     # Configurar archivos con nombres que incluyan la cantidad de páginas y preserve_query

@@ -5,7 +5,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from lib.Crawler import Crawler
 from lib.CrawlerParallel import CrawlerParallel
-import json
 
 
 def main():
@@ -20,10 +19,10 @@ def main():
         crawler = CrawlerParallel(
             max_depth=3,
             max_dir_depth=3,
-            max_pages_per_site=100,
+            max_pages_per_site=500,
             domain_filter="mercadolibre.com.ar",
             preserve_query=True,  # Preservar query params
-            max_total_pages=100,
+            max_total_pages=500,
             max_workers=5,  # Número de workers para crawling paralelo
         )
     else:
@@ -31,13 +30,13 @@ def main():
         crawler = Crawler(
             max_depth=3,
             max_dir_depth=3,
-            max_pages_per_site=100,
+            max_pages_per_site=500,
             domain_filter="mercadolibre.com.ar",
             preserve_query=True,  # Preservar query params
-            max_total_pages=100,
+            max_total_pages=500,
         )
 
-    print("Iniciando crawling de MercadoLibre.com.ar...")
+    print("Iniciando crawling de mercadolibre.com.ar...")
     crawler.crawl(initial_urls)
 
     # Guardar estado
@@ -78,12 +77,6 @@ def main():
             print(f"  Directorio nivel {dir_depth}: {count} páginas")
     else:
         print("  No hay datos de distribución por directorio")
-
-    # Guardar estadísticas en JSON
-    with open("mercadolibre_analysis.json", "w") as f:
-        json.dump(stats, f, indent=2)
-
-    print("\nEstadísticas guardadas en mercadolibre_analysis.json")
 
 
 if __name__ == "__main__":
